@@ -4,8 +4,10 @@ import com.snk.jlinq.data.Condition;
 import com.snk.jlinq.data.ExpressionValue;
 import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.function.MemberAccessor;
+import com.snk.jlinq.stream.expression.ExpressionBuilder;
 import com.snk.jlinq.stream.expression.GotPartialExpression;
-import com.snk.jlinq.stream.expression.SelectableStreamExpressionExtender;
+import com.snk.jlinq.stream.expression.InJoinExpressionExtender;
+import com.snk.jlinq.stream.expression.InWhereExpressionExtender;
 import com.snk.jlinq.stream.pipeline.FilterStreamOp;
 import com.snk.jlinq.stream.pipeline.StreamOp;
 
@@ -16,19 +18,19 @@ public class FilterableStream<T> extends SelectableStream<T> {
         super(operatingStream);
     }
 
-    public <IN, OUT> GotPartialExpression<T, OUT, SelectableStreamExpressionExtender<T>, SelectableStream<T>> where(String alias, Function1<IN, OUT> mapper) {
+    public <IN, OUT> GotPartialExpression<T, OUT, InWhereExpressionExtender<T>, InWhereExpectingExpression<T>> where(String alias, Function1<IN, OUT> mapper) {
         return where(ExpressionValue.fromExtractor(MemberAccessor.from(alias, mapper)));
     }
 
-    public <IN, OUT> GotPartialExpression<T, OUT, SelectableStreamExpressionExtender<T>, SelectableStream<T>> where(Function1<IN, OUT> mapper) {
+    public <IN, OUT> GotPartialExpression<T, OUT, InWhereExpressionExtender<T>, InWhereExpectingExpression<T>> where(Function1<IN, OUT> mapper) {
         return where(ExpressionValue.fromExtractor(MemberAccessor.from(mapper)));
     }
 
-    public <IN, OUT> GotPartialExpression<T, OUT, SelectableStreamExpressionExtender<T>, SelectableStream<T>> where(ExpressionValue<OUT> expressionValue) {
-        return GotPartialExpression.forSelect(operatingStream(), expressionValue, FilterableStream::createStreamFromFilters);
+    public <IN, OUT> GotPartialExpression<T, OUT, InWhereExpressionExtender<T>, InWhereExpectingExpression<T>> where(ExpressionValue<OUT> expressionValue) {
+        return GotPartialExpression.forSelect(operatingStream(), expressionValue, this::createStreamFromFilters);
     }
 
-    private static <T> SelectableStream<T> createStreamFromFilters(StreamOp<T> stream, Condition filterCondition) {
-        return new SelectableStream<>(new FilterStreamOp<>(stream, filterCondition));
+    private InWhereExpectingExpression<T> createStreamFromFilters(ExpressionBuilder<T, InWhereExpectingExpression<T>> baseExpression) {
+        return new InWhereExpectingExpression<>(baseExpression);
     }
 }

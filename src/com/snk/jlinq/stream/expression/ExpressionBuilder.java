@@ -6,11 +6,12 @@ import com.snk.jlinq.stream.pipeline.StreamOp;
 
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
+import java.util.function.Function;
 
 public class ExpressionBuilder<T, OS extends SelectableStream<T>> {
     private final StreamOp<T> operatingStream;
     private final Condition condition;
-    private final BiFunction<StreamOp<T>, Condition, OS> outputStreamConstructor;
+    private final Function<ExpressionBuilder<T, OS>, OS> outputStreamConstructor;
 
     public ExpressionBuilder(ExpressionBuilder<T, OS> baseExpression) {
         this.operatingStream = baseExpression.operatingStream();
@@ -18,7 +19,7 @@ public class ExpressionBuilder<T, OS extends SelectableStream<T>> {
         this.outputStreamConstructor = baseExpression.outputStreamConstructor();
     }
 
-    public ExpressionBuilder(StreamOp<T> operatingStream, Condition condition, BiFunction<StreamOp<T>, Condition, OS> outputStreamConstructor) {
+    public ExpressionBuilder(StreamOp<T> operatingStream, Condition condition, Function<ExpressionBuilder<T, OS>, OS> outputStreamConstructor) {
         this.operatingStream = operatingStream;
         this.condition = condition;
         this.outputStreamConstructor = outputStreamConstructor;
@@ -38,12 +39,12 @@ public class ExpressionBuilder<T, OS extends SelectableStream<T>> {
         return condition;
     }
 
-    public BiFunction<StreamOp<T>, Condition, OS> outputStreamConstructor() {
+    public Function<ExpressionBuilder<T, OS>, OS> outputStreamConstructor() {
         return outputStreamConstructor;
     }
 
     public OS outputStream() {
-        return outputStreamConstructor.apply(operatingStream, condition);
+        return outputStreamConstructor.apply(this);
     }
 
 }
