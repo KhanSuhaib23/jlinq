@@ -27,6 +27,14 @@ public class StreamAlias {
         return clazz;
     }
 
+    public boolean canMatch(StreamAlias other) {
+        if (name == null || name.isBlank()) {
+            return clazz.equals(other.clazz);
+        } else {
+            return name.equals(other.name) && clazz.equals(other.clazz);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -43,5 +51,13 @@ public class StreamAlias {
         int result = name != null ? name.hashCode() : 0;
         result = 31 * result + (clazz != null ? clazz.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "StreamAlias{" +
+                "name='" + name + '\'' +
+                ", clazz=" + clazz.getName() +
+                '}';
     }
 }

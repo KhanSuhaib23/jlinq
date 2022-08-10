@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.stream.Stream;
 
 public class JLinq {
-    public static <T> FilterableStream<T> from(Stream<T> stream, Class<?> clazz) {
-        return new FilterableStream<>(new RootStreamOp<>(new EnrichedStream<>(stream, StreamContext.init(clazz), Collections.emptyList())));
+    public static <T> JoinableJoin1Stream<T> from(Stream<T> stream, Class<?> clazz) {
+        return new JoinableJoin1Stream<>(new RootStreamOp<>(new EnrichedStream<>(stream, StreamContext.init(clazz), Collections.emptyList())));
     }
 }

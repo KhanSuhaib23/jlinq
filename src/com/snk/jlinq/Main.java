@@ -22,7 +22,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        Stream<Employee> employees = Stream.of(
+        List<Employee> employees = Stream.of(
                 new Employee(1, "ABC", 1),
                 new Employee(2, "PQR", 2),
                 new Employee(3, "STU", 1),
@@ -37,13 +37,20 @@ public class Main {
                 new Employee(12, "NAN2", 2),
                 new Employee(13, "TEN2", 1),
                 new Employee(14, "PAK2", 3)
-        );
+        ).collect(Collectors.toList());
 
-        List<Tuple2<Integer, String>> t = JLinq.from(employees, Employee.class)
-                .where(Employee::deptId).eq(1)
-                .or(Employee::deptId).eq(2)
-                .select(Employee::id)
-                .comma(Employee::name)
+        List<Department> departments = Stream.of(
+                new Department(1, "COMP"),
+                new Department(2, "IT"),
+                new Department(3, "EXTC")
+        ).collect(Collectors.toList());
+
+        List<Tuple2<String, String>> t = JLinq.from(employees.stream(), Employee.class)
+                .join("d", departments.stream(), Department.class)
+                .on(Employee::deptId).eq(Department::id)
+                .where(Department::name).eq("COMP")
+                .select(Employee::name)
+                .comma(Department::name)
                 .collect(Collectors.toList());
 
         System.out.println();
