@@ -4,8 +4,11 @@ import com.snk.jlinq.data.Condition;
 import com.snk.jlinq.data.ExpressionValue;
 import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.function.MemberAccessor;
+import com.snk.jlinq.stream.InJoinExpectingOn;
 import com.snk.jlinq.stream.JoinableJoin2Stream;
+import com.snk.jlinq.stream.JoinableStream;
 import com.snk.jlinq.stream.SelectableStream;
+import com.snk.jlinq.stream.pipeline.CombinedStreamOp;
 import com.snk.jlinq.stream.pipeline.DualStreamOp;
 import com.snk.jlinq.stream.pipeline.StreamOp;
 import com.snk.jlinq.tuple.Tuple2;
@@ -41,14 +44,20 @@ public class GotPartialExpression<T, ET, EX extends ExpressionExtender<T, OS, EX
         this.conditionTransformer = conditionTransformer;
     }
 
+
     public static <T, ET> GotPartialExpression<T, ET, SelectableStreamExpressionExtender<T>, SelectableStream<T>>
     forSelect(StreamOp<T> operatingStream, ExpressionValue<ET> lValue, BiFunction<StreamOp<T>, Condition, SelectableStream<T>> outputStreamConstructor) {
         return new GotPartialExpression<>(operatingStream, lValue, SelectableStreamExpressionExtender::of, outputStreamConstructor);
     }
 
-    public static <T1, T2, ET> GotPartialExpression<Tuple2<T1, T2>, ET, JoinStreamExpressionExtender<T1, T2>, JoinableJoin2Stream<T1, T2>>
-    forJoin(StreamOp<T1> left, StreamOp<T2> right, ExpressionValue<ET> lValue, BiFunction<StreamOp<Tuple2<T1, T2>>, Condition, JoinableJoin2Stream<T1, T2>> outputStreamConstructor) {
-        return new GotPartialExpression<>(new DualStreamOp<>(left, right), lValue, JoinStreamExpressionExtender::of, outputStreamConstructor);
+//    public static <T1, T2, ET> GotPartialExpression<Tuple2<T1, T2>, ET, Join1StreamExpressionExtender<T1, T2>, JoinableJoin2Stream<T1, T2>>
+//    forJoin1(StreamOp<T1> left, StreamOp<T2> right, ExpressionValue<ET> lValue, BiFunction<StreamOp<Tuple2<T1, T2>>, Condition, JoinableJoin2Stream<T1, T2>> outputStreamConstructor) {
+//        return new GotPartialExpression<>(new DualStreamOp<>(left, right), lValue, Join1StreamExpressionExtender::of, outputStreamConstructor);
+//    }
+
+    public static <T1, T2, OT, ET, EX extends ExpressionExtender<OT, OS, EX>, OS extends JoinableStream<T1, T2, OT, OS, IJ>, IJ extends InJoinExpectingOn<T1, T2, OT, IJ, OS>> GotPartialExpression<OT, ET, EX, OS>
+    forJoin(StreamOp<T1> left, StreamOp<T2> right, ExpressionValue<ET> lValue, BiFunction<StreamOp<OT>, Condition, OS> outputStreamConstructor) {
+        return new GotPartialExpression<>(new CombinedStreamOp<>(left, right), lValue, JoinStreamExpressionExtender::of, outputStreamConstructor);
     }
 
     public <IN> EX eq(String alias, Function1<IN, ET> mapper) {

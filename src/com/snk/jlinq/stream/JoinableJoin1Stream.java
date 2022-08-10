@@ -7,7 +7,7 @@ import com.snk.jlinq.stream.pipeline.StreamOp;
 import java.util.Collections;
 import java.util.stream.Stream;
 
-public class JoinableJoin1Stream<T> extends FilterableStream<T> {
+public class JoinableJoin1Stream<T> extends JoinableStream<T> {
     public JoinableJoin1Stream(StreamOp<T> operatingStream) {
         super(operatingStream);
     }

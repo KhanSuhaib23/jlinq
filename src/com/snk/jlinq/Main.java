@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 public class Main {
 
-    private record Employee(Integer id, String name, Integer deptId) {
+    private record Employee(Integer id, String name, Integer deptId, Integer managerId) {
     }
 
     private record Department(Integer id, String name) {
@@ -23,20 +23,20 @@ public class Main {
     public static void main(String[] args) {
 
         List<Employee> employees = Stream.of(
-                new Employee(1, "ABC", 1),
-                new Employee(2, "PQR", 2),
-                new Employee(3, "STU", 1),
-                new Employee(4, "XYZ", 2),
-                new Employee(5, "NAN", 2),
-                new Employee(6, "TEN", 1),
-                new Employee(7, "PAK", 3),
-                new Employee(8, "ABC2", 1),
-                new Employee(9, "PQR2", 2),
-                new Employee(10, "STU2", 1),
-                new Employee(11, "XYZ2", 2),
-                new Employee(12, "NAN2", 2),
-                new Employee(13, "TEN2", 1),
-                new Employee(14, "PAK2", 3)
+                new Employee(1, "ABC", 1, 0),
+                new Employee(2, "PQR", 2, 0),
+                new Employee(3, "STU", 1, 0),
+                new Employee(4, "XYZ", 2, 1),
+                new Employee(5, "NAN", 2, 2),
+                new Employee(6, "TEN", 1, 2),
+                new Employee(7, "PAK", 3, 1),
+                new Employee(8, "ABC2", 1, 3),
+                new Employee(9, "PQR2", 2, 3),
+                new Employee(10, "STU2", 1, 1),
+                new Employee(11, "XYZ2", 2, 2),
+                new Employee(12, "NAN2", 2, 2),
+                new Employee(13, "TEN2", 1, 2),
+                new Employee(14, "PAK2", 3, 3)
         ).collect(Collectors.toList());
 
         List<Department> departments = Stream.of(
