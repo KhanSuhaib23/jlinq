@@ -1,11 +1,12 @@
 package com.snk.jlinq.stream.expression;
 
-import com.snk.jlinq.data.ConditionValue;
+import com.snk.jlinq.data.Condition;
+import com.snk.jlinq.data.ExpressionValue;
 import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.function.MemberAccessor;
 import com.snk.jlinq.stream.EnrichedStream;
-import com.snk.jlinq.stream.SelectStream;
 import com.snk.jlinq.stream.SelectableStream;
+import com.snk.jlinq.stream.pipeline.StreamOp;
 
 import java.util.stream.Stream;
 
@@ -13,7 +14,7 @@ public class SelectableStreamExpressionExtender<T> extends SelectableStream<T> i
     private final ExpressionBuilder<T, SelectableStream<T>> baseExpression;
 
     public SelectableStreamExpressionExtender(ExpressionBuilder<T, SelectableStream<T>> baseExpression) {
-        super(baseExpression.baseStream());
+        super(baseExpression.operatingStream());
         this.baseExpression = baseExpression;
     }
 
@@ -23,21 +24,40 @@ public class SelectableStreamExpressionExtender<T> extends SelectableStream<T> i
 
     @Override
     public <IN, OUT> GotPartialExpression<T, OUT, SelectableStreamExpressionExtender<T>, SelectableStream<T>> and(String alias, Function1<IN, OUT> mapper) {
-        return and(ConditionValue.fromExtractor(MemberAccessor.from(alias, mapper)));
+        return and(ExpressionValue.fromExtractor(MemberAccessor.from(alias, mapper)));
     }
 
     @Override
     public <IN, OUT> GotPartialExpression<T, OUT, SelectableStreamExpressionExtender<T>, SelectableStream<T>> and(Function1<IN, OUT> mapper) {
-        return and(ConditionValue.fromExtractor(MemberAccessor.from(mapper)));
+        return and(ExpressionValue.fromExtractor(MemberAccessor.from(mapper)));
     }
 
     @Override
     public <OUT> GotPartialExpression<T, OUT, SelectableStreamExpressionExtender<T>, SelectableStream<T>> and(OUT value) {
-        return and(ConditionValue.fromScalar(value));
+        return and(ExpressionValue.fromScalar(value));
     }
 
-    private <OUT> GotPartialExpression<T, OUT, SelectableStreamExpressionExtender<T>, SelectableStream<T>> and(ConditionValue<OUT> conditionValue) {
-        return new GotPartialExpression<>(baseExpression, conditionValue, SelectableStreamExpressionExtender::of);
+    @Override
+    public <IN, OUT> GotPartialExpression<T, OUT, SelectableStreamExpressionExtender<T>, SelectableStream<T>> or(String alias, Function1<IN, OUT> mapper) {
+        return or(ExpressionValue.fromExtractor(MemberAccessor.from(alias, mapper)));
+    }
+
+    @Override
+    public <IN, OUT> GotPartialExpression<T, OUT, SelectableStreamExpressionExtender<T>, SelectableStream<T>> or(Function1<IN, OUT> mapper) {
+        return or(ExpressionValue.fromExtractor(MemberAccessor.from(mapper)));
+    }
+
+    @Override
+    public <OUT> GotPartialExpression<T, OUT, SelectableStreamExpressionExtender<T>, SelectableStream<T>> or(OUT value) {
+        return or(ExpressionValue.fromScalar(value));
+    }
+
+    private <OUT> GotPartialExpression<T, OUT, SelectableStreamExpressionExtender<T>, SelectableStream<T>> and(ExpressionValue<OUT> expressionValue) {
+        return new GotPartialExpression<>(baseExpression, expressionValue, SelectableStreamExpressionExtender::of, Condition::and);
+    }
+
+    private <OUT> GotPartialExpression<T, OUT, SelectableStreamExpressionExtender<T>, SelectableStream<T>> or(ExpressionValue<OUT> expressionValue) {
+        return new GotPartialExpression<>(baseExpression, expressionValue, SelectableStreamExpressionExtender::of, Condition::or);
     }
 
     @Override
@@ -46,12 +66,12 @@ public class SelectableStreamExpressionExtender<T> extends SelectableStream<T> i
     }
 
     @Override
-    public SelectStream<T> selectStream() {
-        return baseExpression.outputStream();
+    public StreamOp<T> operatingStream() {
+        return baseExpression.outputStream().operatingStream();
     }
 
     @Override
     public EnrichedStream<T> outputStream() {
-        return baseExpression.outputStream().outputStream();
+        return operatingStream().outputStream();
     }
 }

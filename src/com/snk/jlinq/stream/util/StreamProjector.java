@@ -11,14 +11,14 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class StreamProjector {
-    public static <RT, OT> Stream<RT> project(EnrichedStream<OT> enrichedStream, List<MemberAccessor> projections) {
+    public static <RT, OT> EnrichedStream<RT> project(EnrichedStream<OT> enrichedStream, List<MemberAccessor> projections) {
         Function<OT, RT> f;
         switch (projections.size()) {
             case 1: {
                 MemberAccessor m1 = projections.get(0);
 
                 f = v -> (RT) ReflectionUtil.invoke(m1.method(), TupleUtil.getAt(v, enrichedStream.aliasIndex(m1.streamAlias())));
-                return enrichedStream.stream().map(f);
+                return EnrichedStream.withNewStream(enrichedStream, enrichedStream.stream().map(f));
             }
             case 2: {
                 MemberAccessor m1 = projections.get(0);
@@ -26,7 +26,7 @@ public class StreamProjector {
                 f = v -> (RT) new Tuple2<>(ReflectionUtil.invoke(m1.method(), TupleUtil.getAt(v, enrichedStream.aliasIndex(m1.streamAlias()))),
                                             ReflectionUtil.invoke(m2.method(), TupleUtil.getAt(v, enrichedStream.aliasIndex(m2.streamAlias()))));
 
-                return enrichedStream.stream().map(f);
+                return EnrichedStream.withNewStream(enrichedStream, enrichedStream.stream().map(f));
             }
 
             default: {

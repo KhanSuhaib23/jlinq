@@ -1,6 +1,5 @@
 package com.snk.jlinq.stream;
 
-import com.snk.jlinq.data.Condition;
 import com.snk.jlinq.data.StreamAlias;
 import com.snk.jlinq.data.StreamContext;
 import com.snk.jlinq.function.MemberAccessor;
@@ -17,6 +16,10 @@ public class EnrichedStream<T> {
         this.stream = stream;
         this.orderedBy = orderedBy;
         this.context = context;
+    }
+
+    public static <T, R> EnrichedStream<R> withNewStream(EnrichedStream<T> underlyingStream, Stream<R> stream) {
+        return new EnrichedStream<>(stream, underlyingStream.context(), underlyingStream.orderedBy());
     }
 
     public Stream<T> stream() {

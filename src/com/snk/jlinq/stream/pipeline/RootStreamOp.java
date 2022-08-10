@@ -1,11 +1,14 @@
-package com.snk.jlinq.stream;
+package com.snk.jlinq.stream.pipeline;
 
-public class BaseStream<T> extends SelectStream<T> {
+import com.snk.jlinq.stream.EnrichedStream;
+
+public class RootStreamOp<T> implements StreamOp<T> {
     private final EnrichedStream<T> enrichedStream;
 
-    public BaseStream(EnrichedStream<T> enrichedStream) {
+    public RootStreamOp(EnrichedStream<T> enrichedStream) {
         this.enrichedStream = enrichedStream;
     }
+
 
     @Override
     public EnrichedStream<T> outputStream() {

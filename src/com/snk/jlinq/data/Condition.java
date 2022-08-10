@@ -1,30 +1,54 @@
 package com.snk.jlinq.data;
 
-public class Condition<T> {
+public abstract class Condition {
+    public abstract boolean value(StreamContext context, Object object);
 
-    private final ConditionValue<T> left;
-    private final ConditionValue<T> right;
-    private final ConditionType conditionType;
-
-    private Condition(ConditionValue<T> left, ConditionValue<T> right, ConditionType conditionType) {
-        this.left = left;
-        this.right = right;
-        this.conditionType = conditionType;
+    public static <T> Condition eq(ExpressionValue<T> left, ExpressionValue<T> right) {
+        return new BooleanExpression<>(left, right, ExpressionType.EQ);
     }
 
-    public ConditionValue<T> left() {
-        return left;
+    public Condition and(Condition other) {
+        return new InternalNode(this, other, BooleanOperator.AND);
     }
 
-    public ConditionValue<T> right() {
-        return right;
+    public Condition or(Condition other) {
+        return new InternalNode(this, other, BooleanOperator.OR);
     }
 
-    public ConditionType conditionType() {
-        return conditionType;
+    public static class InternalNode extends Condition {
+        private final Condition left;
+        private final Condition right;
+        private final BooleanOperator operator;
+
+        public InternalNode(Condition left, Condition right, BooleanOperator operator) {
+            this.left = left;
+            this.right = right;
+            this.operator = operator;
+        }
+
+        @Override
+        public boolean value(StreamContext context, Object object) {
+            return operator.eval(left.value(context, object), right.value(context, object));
+        }
     }
 
-    public static <T> Condition<T> eq(ConditionValue<T> left, ConditionValue<T> right) {
-        return new Condition<>(left, right, ConditionType.EQ);
+    public static class BooleanExpression<T> extends Condition {
+        private final ExpressionValue<T> left;
+        private final ExpressionValue<T> right;
+        private final ExpressionType expressionType;
+
+        private BooleanExpression(ExpressionValue<T> left, ExpressionValue<T> right, ExpressionType expressionType) {
+            this.left = left;
+            this.right = right;
+            this.expressionType = expressionType;
+        }
+
+        @Override
+        public boolean value(StreamContext context, Object object) {
+            Object o1 = left.getValue(context, object);
+            Object o2 = right.getValue(context, object);
+
+            return expressionType.value(o1, o2);
+        }
     }
 }

@@ -1,52 +1,49 @@
 package com.snk.jlinq.stream.expression;
 
-import com.snk.jlinq.core.ListUtil;
 import com.snk.jlinq.data.Condition;
-import com.snk.jlinq.stream.SelectStream;
 import com.snk.jlinq.stream.SelectableStream;
+import com.snk.jlinq.stream.pipeline.StreamOp;
 
-import java.util.List;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.function.BinaryOperator;
 
 public class ExpressionBuilder<T, OS extends SelectableStream<T>> {
-    private final SelectStream<T> baseStream;
-    private final List<Condition> conditions;
-    private final BiFunction<SelectStream<T>, List<Condition>, OS> outputStreamConstructor;
+    private final StreamOp<T> operatingStream;
+    private final Condition condition;
+    private final BiFunction<StreamOp<T>, Condition, OS> outputStreamConstructor;
 
     public ExpressionBuilder(ExpressionBuilder<T, OS> baseExpression) {
-        this.baseStream = baseExpression.baseStream();
-        this.conditions = baseExpression.conditions();
+        this.operatingStream = baseExpression.operatingStream();
+        this.condition = baseExpression.condition();
         this.outputStreamConstructor = baseExpression.outputStreamConstructor();
     }
 
-    public ExpressionBuilder(SelectStream<T> baseStream, List<Condition> conditions, BiFunction<SelectStream<T>, List<Condition>, OS> outputStreamConstructor) {
-        this.baseStream = baseStream;
-        this.conditions = conditions;
+    public ExpressionBuilder(StreamOp<T> operatingStream, Condition condition, BiFunction<StreamOp<T>, Condition, OS> outputStreamConstructor) {
+        this.operatingStream = operatingStream;
+        this.condition = condition;
         this.outputStreamConstructor = outputStreamConstructor;
     }
 
-    public ExpressionBuilder(ExpressionBuilder<T, OS> baseExpression, Condition newCondition) {
-        this.baseStream = baseExpression.baseStream();
+    public ExpressionBuilder(ExpressionBuilder<T, OS> baseExpression, Condition newCondition, BinaryOperator<Condition> conditionTransformer) {
+        this.operatingStream = baseExpression.operatingStream();
         this.outputStreamConstructor = baseExpression.outputStreamConstructor();
-        this.conditions = ListUtil.addOne(baseExpression.conditions(), newCondition);
+        this.condition = baseExpression.condition() == null ? newCondition : conditionTransformer.apply(baseExpression.condition(), newCondition);
     }
 
-    public SelectStream<T> baseStream() {
-        return baseStream;
+    public StreamOp<T> operatingStream() {
+        return operatingStream;
     }
 
-    public List<Condition> conditions() {
-        return conditions;
+    public Condition condition() {
+        return condition;
     }
 
-    public BiFunction<SelectStream<T>, List<Condition>, OS> outputStreamConstructor() {
+    public BiFunction<StreamOp<T>, Condition, OS> outputStreamConstructor() {
         return outputStreamConstructor;
     }
 
     public OS outputStream() {
-        return outputStreamConstructor.apply(baseStream, conditions);
+        return outputStreamConstructor.apply(operatingStream, condition);
     }
 
 }
