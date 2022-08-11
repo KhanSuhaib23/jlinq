@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 // Select essentially apply some operation on type OT (type of underlying stream) to convert is to RT, which is the
 // type of the returned stream
 public class SelectableStream<T> extends SelectStream<T> {
-    private final StreamOp<T> operatingStream;
+    protected final StreamOp<T> operatingStream;
 
     public SelectableStream(StreamOp<T> operatingStream) {
         this.operatingStream = operatingStream;

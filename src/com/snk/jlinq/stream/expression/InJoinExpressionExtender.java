@@ -6,6 +6,7 @@ import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.function.MemberAccessor;
 import com.snk.jlinq.stream.EnrichedStream;
 import com.snk.jlinq.stream.FilterableStream;
+import com.snk.jlinq.stream.SortableStream;
 import com.snk.jlinq.stream.pipeline.CombinedStreamOp;
 import com.snk.jlinq.stream.pipeline.FilterStreamOp;
 import com.snk.jlinq.stream.pipeline.JoinStreamOp;
@@ -14,7 +15,7 @@ import com.snk.jlinq.stream.pipeline.StreamOp;
 import java.util.stream.Stream;
 
 public class InJoinExpressionExtender<OT, JT extends InJoinExpressionExtender<OT, JT>>
-        extends FilterableStream<OT> implements ExpressionExtender<OT, JT, InJoinExpressionExtender<OT, JT>> {
+        extends SortableStream<OT> implements ExpressionExtender<OT, JT, InJoinExpressionExtender<OT, JT>> {
     protected final ExpressionBuilder<OT, JT> baseExpression;
 
     public InJoinExpressionExtender(ExpressionBuilder<OT, JT> baseExpression) {

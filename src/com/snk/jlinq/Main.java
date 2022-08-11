@@ -51,6 +51,8 @@ public class Main {
                 .on(Employee::deptId).eq(Department::id)
                 .join("m", employees.stream(), Employee.class)
                 .on(Employee::managerId).eq("m", Employee::id)
+                .orderBy(Employee::name)
+                .then("m", Employee::name)
                 .where(Department::name).eq("COMP")
                 .select(Employee::name)
                 .comma(Department::name)

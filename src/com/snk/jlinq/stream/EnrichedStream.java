@@ -38,7 +38,7 @@ public class EnrichedStream<T> {
         return context.get(streamAlias); // TODO: possible null pointer exception
     }
 
-    public boolean isOrderedBy(List<MemberAccessor<?>> toOrderBy) {
+    public boolean isOrderedBy(List<MemberAccessor> toOrderBy) {
         if (toOrderBy.size() <= orderedBy.size()) {
             for (int i = 0; i < toOrderBy.size(); ++i) {
                 if (!toOrderBy.get(i).equals(orderedBy.get(i))) {
