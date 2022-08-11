@@ -5,6 +5,7 @@ import com.snk.jlinq.stream.JLinq;
 import com.snk.jlinq.stream.SelectStream;
 import com.snk.jlinq.tuple.Pair;
 import com.snk.jlinq.tuple.Tuple2;
+import com.snk.jlinq.tuple.Tuple3;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,12 +46,15 @@ public class Main {
                 new Department(3, "EXTC")
         ).collect(Collectors.toList());
 
-        List<Tuple2<String, String>> t = JLinq.from(employees.stream(), Employee.class)
+        List<Tuple3<String, String, String>> t = JLinq.from(employees.stream(), Employee.class)
                 .join("d", departments.stream(), Department.class)
                 .on(Employee::deptId).eq(Department::id)
+                .join("m", employees.stream(), Employee.class)
+                .on(Employee::managerId).eq("m", Employee::id)
                 .where(Department::name).eq("COMP")
                 .select(Employee::name)
                 .comma(Department::name)
+                .comma("m", Employee::name)
                 .collect(Collectors.toList());
 
         System.out.println();

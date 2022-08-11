@@ -3,6 +3,7 @@ package com.snk.jlinq.stream.util;
 import com.snk.jlinq.data.Condition;
 import com.snk.jlinq.data.StreamContext;
 import com.snk.jlinq.stream.EnrichedStream;
+import com.snk.jlinq.stream.pipeline.StreamOp;
 import com.snk.jlinq.tuple.Tuple2;
 
 import java.util.Collections;
