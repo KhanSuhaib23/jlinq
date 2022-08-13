@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.snk.jlinq.stream.JLinq.from;
+
 public class Main {
 
     private record Employee(Integer id, String name, Integer deptId, Integer managerId) {
@@ -46,17 +48,34 @@ public class Main {
                 new Department(3, "EXTC")
         ).collect(Collectors.toList());
 
-        List<Tuple3<String, String, String>> t = JLinq.from(employees.stream(), Employee.class)
+        /*
+        Stream<Tuple2<Employee, Department>> employeeDepartment = join(employees.stream(), department.stream())
+                                               .on((e, d) -> e.deptId() == d.id())
+                                               .map((e, d) -> new Tuple2<>(e, d))
+                                               .stream();
+
+        Stream<Tuple3<Employee, Department, Employee>> t = join(employeeDepartment, employees.stream())
+                                                            .on((t2, e) -> t2.v1().managerId() == e.id())
+                                                            .map((t2, d) -> new Tuple3<>(t2.v1(), t2.v2(), d))
+                                                            .stream();
+
+        Stream<Tuple3<String, String, String>> r = t
+                                                    .filter(t3 -> t3.v2().name().equals("COMP"))
+                                                    .sorted(Comparator.comparing(t3 -> t3.v1().name()).thenComparing(t3 -> t3.v3().name()))
+                                                    .map(t3 -> new Tuple3<>(t3.v1().name(), t3.v2().name(), t3.v3().name()))
+                                                    .collect(toList());
+
+         */
+
+        List<Tuple3<String, String, String>> t =
+                from(employees.stream(), Employee.class)
                 .join("d", departments.stream(), Department.class)
-                .on(Employee::deptId).eq(Department::id)
+                    .on(Employee::deptId).eq(Department::id)
                 .join("m", employees.stream(), Employee.class)
-                .on(Employee::managerId).eq("m", Employee::id)
-                .orderBy(Employee::name)
-                .then("m", Employee::name)
+                    .on(Employee::managerId).eq("m", Employee::id)
+                .orderBy(Employee::name).then("m", Employee::name)
                 .where(Department::name).eq("COMP")
-                .select(Employee::name)
-                .comma(Department::name)
-                .comma("m", Employee::name)
+                .select(Employee::name).comma(Department::name).comma("m", Employee::name)
                 .collect(Collectors.toList());
 
         System.out.println();
