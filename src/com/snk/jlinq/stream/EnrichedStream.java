@@ -5,6 +5,7 @@ import com.snk.jlinq.data.StreamContext;
 import com.snk.jlinq.function.MemberAccessor;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class EnrichedStream<T> {
@@ -34,7 +35,7 @@ public class EnrichedStream<T> {
         return orderedBy;
     }
 
-    public Integer aliasIndex(StreamAlias streamAlias) {
+    public Function<Object, Object> aliasMapper(StreamAlias streamAlias) {
         return context.get(streamAlias); // TODO: possible null pointer exception
     }
 

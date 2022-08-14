@@ -1,21 +1,15 @@
 package com.snk.jlinq.tuple;
 
+import java.util.List;
+
 public class TupleUtil {
 
-    public static Object getAt(Object tuple, int i) {
-        switch (i) {
-            case 1:
-                try {
-                    return ((Tuple1) tuple).v1();
-                } catch (ClassCastException e) {
-                    return tuple;
-                }
-            case 2:
-                return ((Tuple2) tuple).v2();
-            case 3:
-                return ((Tuple3) tuple).v3();
-            default:
-                throw new RuntimeException("Index out of bound for the tuple");
+    public static Object createTuple(List<Object> objectList) {
+        switch (objectList.size()) {
+            case 1: return objectList.get(0);
+            case 2: return new Tuple2<>(objectList.get(0), objectList.get(1));
+            case 3: return new Tuple3<>(objectList.get(0), objectList.get(1), objectList.get(2));
+            default: throw new RuntimeException("Tuple index exceeded max tuple size");
         }
     }
 }

@@ -15,8 +15,8 @@ public class StreamOrderBy {
         } else {
             Comparator<T> comparator = (v1, v2) -> {
                 for (MemberAccessor orderBy : orderBys) {
-                    Comparable c1 = ReflectionUtil.invoke(orderBy.method(), TupleUtil.getAt(v1, stream.aliasIndex(orderBy.streamAlias())));
-                    Comparable c2 = ReflectionUtil.invoke(orderBy.method(), TupleUtil.getAt(v2, stream.aliasIndex(orderBy.streamAlias())));
+                    Comparable c1 = ReflectionUtil.invoke(orderBy.method(), stream.aliasMapper(orderBy.streamAlias()).apply(v1));
+                    Comparable c2 = ReflectionUtil.invoke(orderBy.method(), stream.aliasMapper(orderBy.streamAlias()).apply(v2));
                     int c = c1.compareTo(c2);
 
                     if (c != 0) {

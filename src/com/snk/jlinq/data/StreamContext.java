@@ -1,26 +1,29 @@
 package com.snk.jlinq.data;
 
-import com.snk.jlinq.tuple.Pair;
+import com.snk.jlinq.tuple.*;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class StreamContext {
-    private final Map<StreamAlias, Integer> streamAliasMap;
+    private final static List<Function<Object, Object>> baseMapper =
+            Arrays.asList(
+                    (Object t) -> ((Tuple1) t).v1(),
+                    (Object t) -> ((Tuple2) t).v2(),
+                    (Object t) -> ((Tuple3) t).v3()
 
-    private StreamContext(Map<StreamAlias, Integer> streamAliasMap) {
+            );
+
+    private final Map<StreamAlias, Function<Object, Object>> streamAliasMap;
+
+    private StreamContext(Map<StreamAlias, Function<Object, Object>> streamAliasMap) {
         this.streamAliasMap = streamAliasMap;
     }
 
-    public Map<StreamAlias, Integer> streamAliasMap() {
-        return streamAliasMap;
-    }
-
-    public Integer get(StreamAlias alias) {
-        List<Pair<StreamAlias, Integer>> l = streamAliasMap.entrySet().stream().map(Pair::of)
+    public Function<Object, Object> get(StreamAlias alias) {
+        List<Pair<StreamAlias, Function<Object, Object>>> l = streamAliasMap.entrySet().stream().map(Pair::of)
                 .filter(p -> alias.canMatch(p.left()))
                 .collect(Collectors.toList());
 
@@ -38,11 +41,11 @@ public class StreamContext {
     }
 
     public static StreamContext init(Class<?> clazz) {
-        return new StreamContext(Map.of(StreamAlias.of(clazz), 1));
+        return new StreamContext(Map.of(StreamAlias.of(clazz), Function.identity()));
     }
 
     public static StreamContext init(String alias, Class<?> clazz) {
-        return new StreamContext(Map.of(StreamAlias.of(clazz, alias), 1));
+        return new StreamContext(Map.of(StreamAlias.of(clazz, alias), Function.identity()));
     }
 
     public Class<?> classAt(int i) {
@@ -56,7 +59,7 @@ public class StreamContext {
 
 
     public StreamContext merge(StreamContext otherContext) {
-        Integer max = streamAliasMap.values().stream().max(Comparator.naturalOrder()).orElseThrow(RuntimeException::new);
+        int max = streamAliasMap.size();
 
         otherContext.streamAliasMap.keySet()
                 .stream()
@@ -65,11 +68,21 @@ public class StreamContext {
                     throw new RuntimeException("Stream Alias " + k + " already exists in context");
                 });
 
-        Map<StreamAlias, Integer> newMap = Stream.concat(
-                streamAliasMap.entrySet().stream().map(Pair::of),
-                otherContext.streamAliasMap.entrySet().stream().map(Pair::of).map(p -> Pair.of(p.left(), p.right() + max))
-        )
-                .collect(Collectors.toMap(Pair::left, Pair::right));
+        Map<StreamAlias, Function<Object, Object>> newMap = new HashMap<>();
+
+        if (streamAliasMap.size() == 1) {
+            streamAliasMap.entrySet().stream()
+                    .forEach(e -> newMap.put(e.getKey(), baseMapper.get(0)));
+        } else {
+            streamAliasMap.entrySet().stream()
+                    .forEach(e -> newMap.put(e.getKey(), e.getValue()));
+        }
+
+        Iterator<StreamAlias> otherKeys = otherContext.streamAliasMap.keySet().iterator();
+
+        while (otherKeys.hasNext()) {
+            newMap.put(otherKeys.next(), baseMapper.get(max++));
+        }
 
         return new StreamContext(newMap);
     }

@@ -25,7 +25,7 @@ public abstract class ExpressionValue<T> {
 
         @Override
         public <R> T getValue(StreamContext streamContext, R in) {
-            return (T) ReflectionUtil.invoke(reference.method(), TupleUtil.getAt(in, streamContext.get(reference.streamAlias())));
+            return (T) ReflectionUtil.invoke(reference.method(), streamContext.get(reference.streamAlias()).apply(in));
         }
     }
 
