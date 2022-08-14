@@ -1,6 +1,8 @@
-package com.snk.jlinq.stream;
+package com.snk.jlinq.stream.join;
 
 import com.snk.jlinq.data.StreamContext;
+import com.snk.jlinq.stream.EnrichedStream;
+import com.snk.jlinq.stream.SortableStream;
 import com.snk.jlinq.stream.pipeline.RootStreamOp;
 import com.snk.jlinq.stream.pipeline.StreamOp;
 import com.snk.jlinq.tuple.Tuple2;

@@ -1,4 +1,4 @@
-package com.snk.jlinq.stream;
+package com.snk.jlinq.stream.join;
 
 import com.snk.jlinq.data.Condition;
 import com.snk.jlinq.data.ExpressionValue;

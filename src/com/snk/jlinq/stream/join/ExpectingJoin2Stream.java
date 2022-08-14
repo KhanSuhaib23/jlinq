@@ -1,6 +1,7 @@
-package com.snk.jlinq.stream;
+package com.snk.jlinq.stream.join;
 
 import com.snk.jlinq.data.StreamContext;
+import com.snk.jlinq.stream.EnrichedStream;
 import com.snk.jlinq.stream.expression.ExpressionBuilder;
 import com.snk.jlinq.stream.expression.InJoinExpressionExtender;
 import com.snk.jlinq.stream.pipeline.*;
