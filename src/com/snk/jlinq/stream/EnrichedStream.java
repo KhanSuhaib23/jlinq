@@ -35,8 +35,8 @@ public class EnrichedStream<T> {
         return orderedBy;
     }
 
-    public Function<Object, Object> aliasMapper(StreamAlias streamAlias) {
-        return context.get(streamAlias); // TODO: possible null pointer exception
+    public Function<Object, Object> accessMapper(MemberAccessor memberAccessor) {
+        return context.get(memberAccessor); // TODO: possible null pointer exception
     }
 
     public boolean isOrderedBy(List<MemberAccessor> toOrderBy) {

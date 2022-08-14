@@ -16,7 +16,7 @@ public class StreamProjector {
     public static <RT, OT> EnrichedStream<RT> project(EnrichedStream<OT> enrichedStream, List<MemberAccessor> projections) {
         Function<OT, RT> f = v -> {
             List<Object> tupleObjects = projections.stream()
-                    .map(m -> ReflectionUtil.invoke(m.method(), enrichedStream.aliasMapper(m.streamAlias()).apply(v)))
+                    .map(m -> enrichedStream.accessMapper(m).apply(v))
                     .collect(Collectors.toList());
 
             return (RT) TupleUtil.createTuple(tupleObjects);

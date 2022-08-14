@@ -1,7 +1,11 @@
 package com.snk.jlinq.data;
 
+import com.snk.jlinq.function.MemberAccessor;
+import com.snk.jlinq.function.MethodUtil;
+import com.snk.jlinq.reflect.ReflectionUtil;
 import com.snk.jlinq.tuple.*;
 
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -16,13 +20,35 @@ public class StreamContext {
 
             );
 
+    private final Map<MemberAccessor, Function<Object, Object>> memberAccessMap;
     private final Map<StreamAlias, Function<Object, Object>> streamAliasMap;
 
     private StreamContext(Map<StreamAlias, Function<Object, Object>> streamAliasMap) {
+        this.memberAccessMap = Collections.emptyMap();
         this.streamAliasMap = streamAliasMap;
     }
 
-    public Function<Object, Object> get(StreamAlias alias) {
+    public Function<Object, Object> get(MemberAccessor memberAccessor) {
+        List<Pair<MemberAccessor, Function<Object, Object>>> l = memberAccessMap.entrySet().stream().map(Pair::of)
+                .filter(p -> memberAccessor.streamAlias().canMatch(p.left().streamAlias()))
+                .filter(p -> p.left().method().equals(memberAccessor.method()))
+                .collect(Collectors.toList());
+
+        if (l.size() == 0) {
+            return get(memberAccessor.streamAlias(), memberAccessor.method());
+        } else if (l.size() == 1) {
+            return l.get(0).right().andThen(o -> ReflectionUtil.invoke(memberAccessor.method(), o));
+        } else {
+            return l.stream()
+                    .filter(p -> p.left().streamAlias().name().isBlank())
+                    .findFirst()
+                    .map(Pair::right)
+                    .map(f -> f.andThen(o -> ReflectionUtil.invoke(memberAccessor.method(), o)))
+                    .orElseThrow(RuntimeException::new);
+        }
+    }
+
+    public Function<Object, Object> get(StreamAlias alias, Method method) {
         List<Pair<StreamAlias, Function<Object, Object>>> l = streamAliasMap.entrySet().stream().map(Pair::of)
                 .filter(p -> alias.canMatch(p.left()))
                 .collect(Collectors.toList());
@@ -30,12 +56,13 @@ public class StreamContext {
         if (l.size() == 0) {
             throw new RuntimeException("No stream provided with definition " + alias);
         } else if (l.size() == 1) {
-            return l.get(0).right();
+            return l.get(0).right().andThen(o -> ReflectionUtil.invoke(method, o));
         } else {
             return l.stream()
                     .filter(p -> p.left().name().isBlank())
                     .findFirst()
                     .map(Pair::right)
+                    .map(f -> f.andThen(o -> ReflectionUtil.invoke(method, o)))
                     .orElseThrow(RuntimeException::new);
         }
     }
