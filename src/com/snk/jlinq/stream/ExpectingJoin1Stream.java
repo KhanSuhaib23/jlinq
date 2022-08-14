@@ -8,7 +8,7 @@ import com.snk.jlinq.tuple.Tuple2;
 import java.util.Collections;
 import java.util.stream.Stream;
 
-public class ExpectingJoin1Stream<T> extends FilterableStream<T> {
+public class ExpectingJoin1Stream<T> extends SortableStream<T> {
     public ExpectingJoin1Stream(StreamOp<T> operatingStream) {
         super(operatingStream);
     }

@@ -1,13 +1,7 @@
 package com.snk.jlinq;
 
-import com.snk.jlinq.stream.EnrichedStream;
-import com.snk.jlinq.stream.JLinq;
-import com.snk.jlinq.stream.SelectStream;
-import com.snk.jlinq.tuple.Pair;
-import com.snk.jlinq.tuple.Tuple2;
 import com.snk.jlinq.tuple.Tuple3;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
