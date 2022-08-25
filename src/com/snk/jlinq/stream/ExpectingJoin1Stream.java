@@ -3,13 +3,14 @@ package com.snk.jlinq.stream;
 import com.snk.jlinq.data.StreamContext;
 import com.snk.jlinq.stream.pipeline.RootStreamOp;
 import com.snk.jlinq.stream.pipeline.StreamOp;
+import com.snk.jlinq.tuple.Tuple0;
 import com.snk.jlinq.tuple.Tuple2;
 
 import java.util.Collections;
 import java.util.stream.Stream;
 
-public class ExpectingJoin1Stream<T> extends SortableStream<T> {
-    public ExpectingJoin1Stream(StreamOp<T> operatingStream) {
+public class ExpectingJoin1Stream<T> extends SortableStream<T, Tuple0> {
+    public ExpectingJoin1Stream(StreamOp<T, Tuple0> operatingStream) {
         super(operatingStream);
     }
 

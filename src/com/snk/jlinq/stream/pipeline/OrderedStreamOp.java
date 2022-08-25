@@ -7,16 +7,16 @@ import com.snk.jlinq.stream.util.StreamOrderBy;
 
 import java.util.List;
 
-public class OrderedStreamOp<T> implements StreamOp<T> {
-    private final StreamOp<T> stream;
+public class OrderedStreamOp<GT, OT> implements StreamOp<GT, OT> {
+    private final StreamOp<GT, OT> stream;
     private final List<MemberAccessor> orderBys;
 
-    public OrderedStreamOp(StreamOp<T> stream, List<MemberAccessor> orderBys) {
+    public OrderedStreamOp(StreamOp<GT, OT> stream, List<MemberAccessor> orderBys) {
         this.stream = stream;
         this.orderBys = orderBys;
     }
     @Override
-    public EnrichedStream<T> outputStream() {
+    public EnrichedStream<GT> outputStream() {
         return StreamOrderBy.orderBy(stream.outputStream(), orderBys);
     }
 }

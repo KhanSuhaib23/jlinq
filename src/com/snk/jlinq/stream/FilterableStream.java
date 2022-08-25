@@ -10,27 +10,27 @@ import com.snk.jlinq.stream.expression.InJoinExpressionExtender;
 import com.snk.jlinq.stream.expression.InWhereExpressionExtender;
 import com.snk.jlinq.stream.pipeline.FilterStreamOp;
 import com.snk.jlinq.stream.pipeline.StreamOp;
+import com.snk.jlinq.tuple.Tuple0;
 
+public class FilterableStream<GT, OT> extends SelectableStream<GT, OT> {
 
-public class FilterableStream<T> extends SelectableStream<T> {
-
-    public FilterableStream(StreamOp<T> operatingStream) {
+    public FilterableStream(StreamOp<GT, OT> operatingStream) {
         super(operatingStream);
     }
 
-    public <IN, OUT> GotPartialExpression<T, OUT, InWhereExpressionExtender<T>, InWhereExpectingExpression<T>> where(String alias, Function1<IN, OUT> mapper) {
+    public <IN, OUT> GotPartialExpression<GT, OT, OUT, InWhereExpressionExtender<GT, OT>, InWhereExpectingExpression<GT, OT>> where(String alias, Function1<IN, OUT> mapper) {
         return where(ExpressionValue.fromExtractor(MemberAccessor.from(alias, mapper)));
     }
 
-    public <IN, OUT> GotPartialExpression<T, OUT, InWhereExpressionExtender<T>, InWhereExpectingExpression<T>> where(Function1<IN, OUT> mapper) {
+    public <IN, OUT> GotPartialExpression<GT, OT, OUT, InWhereExpressionExtender<GT, OT>, InWhereExpectingExpression<GT, OT>> where(Function1<IN, OUT> mapper) {
         return where(ExpressionValue.fromExtractor(MemberAccessor.from(mapper)));
     }
 
-    public <IN, OUT> GotPartialExpression<T, OUT, InWhereExpressionExtender<T>, InWhereExpectingExpression<T>> where(ExpressionValue<OUT> expressionValue) {
+    public <IN, OUT> GotPartialExpression<GT, OT, OUT, InWhereExpressionExtender<GT, OT>, InWhereExpectingExpression<GT, OT>> where(ExpressionValue<OUT> expressionValue) {
         return GotPartialExpression.forSelect(operatingStream(), expressionValue, this::createStreamFromFilters);
     }
 
-    private InWhereExpectingExpression<T> createStreamFromFilters(ExpressionBuilder<T, InWhereExpectingExpression<T>> baseExpression) {
+    private InWhereExpectingExpression<GT, OT> createStreamFromFilters(ExpressionBuilder<GT, OT, InWhereExpectingExpression<GT, OT>> baseExpression) {
         return new InWhereExpectingExpression<>(baseExpression);
     }
 }

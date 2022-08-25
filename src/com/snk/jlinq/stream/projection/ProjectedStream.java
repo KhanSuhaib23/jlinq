@@ -5,6 +5,7 @@ import com.snk.jlinq.stream.EnrichedStream;
 import com.snk.jlinq.stream.SelectStream;
 import com.snk.jlinq.stream.pipeline.StreamOp;
 import com.snk.jlinq.stream.util.StreamProjector;
+import com.snk.jlinq.tuple.Tuple0;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,21 +14,21 @@ import java.util.stream.Stream;
 
 // Projection are essentially taking some stream and selecting/projecting parts of it to the output
 // it operates on some operating type OT and returns some new type RT
-public abstract class ProjectedStream<RT, OT> extends SelectStream<RT> {
-    private final StreamOp<OT> operatingStream;
+public abstract class ProjectedStream<RT, GT, OT> extends SelectStream<RT> {
+    private final StreamOp<GT, OT> operatingStream;
     private final List<MemberAccessor> projections;
 
-    public ProjectedStream(StreamOp<OT> operatingStream, MemberAccessor projection) {
+    public ProjectedStream(StreamOp<GT, OT> operatingStream, MemberAccessor projection) {
         this.operatingStream = operatingStream;
         this.projections = Arrays.asList(projection);
     }
 
-    public ProjectedStream(StreamOp<OT> operatingStream, List<MemberAccessor> projections) {
+    public ProjectedStream(StreamOp<GT, OT> operatingStream, List<MemberAccessor> projections) {
         this.operatingStream = operatingStream;
         this.projections = projections;
     }
 
-    public ProjectedStream(StreamOp<OT> operatingStream, List<MemberAccessor> projections, MemberAccessor additionalProjection) {
+    public ProjectedStream(StreamOp<GT, OT> operatingStream, List<MemberAccessor> projections, MemberAccessor additionalProjection) {
         this.operatingStream = operatingStream;
         this.projections = Stream.concat(projections.stream(), Stream.of(additionalProjection)).collect(Collectors.toList());
     }
@@ -36,7 +37,7 @@ public abstract class ProjectedStream<RT, OT> extends SelectStream<RT> {
         return projections;
     }
 
-    protected StreamOp<OT> baseOperatingStream() {
+    protected StreamOp<GT, OT> baseOperatingStream() {
         return operatingStream;
     }
 

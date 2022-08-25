@@ -22,10 +22,12 @@ public class StreamContext {
 
     private final Map<MemberAccessor, Function<Object, Object>> memberAccessMap;
     private final Map<StreamAlias, Function<Object, Object>> streamAliasMap;
+    private final Map<MemberAccessor, Function<Object, Object>> groupMemberAccessor;
 
     private StreamContext(Map<StreamAlias, Function<Object, Object>> streamAliasMap) {
         this.memberAccessMap = Collections.emptyMap();
         this.streamAliasMap = streamAliasMap;
+        this.groupMemberAccessor = Collections.emptyMap();
     }
 
     public Function<Object, Object> get(MemberAccessor memberAccessor) {

@@ -4,6 +4,7 @@ import com.snk.jlinq.data.StreamContext;
 import com.snk.jlinq.stream.expression.ExpressionBuilder;
 import com.snk.jlinq.stream.expression.InJoinExpressionExtender;
 import com.snk.jlinq.stream.pipeline.*;
+import com.snk.jlinq.tuple.Tuple0;
 import com.snk.jlinq.tuple.Tuple2;
 import com.snk.jlinq.tuple.Tuple3;
 
@@ -12,7 +13,7 @@ import java.util.stream.Stream;
 
 public class ExpectingJoin2Stream<T1, T2> extends InJoinExpressionExtender<Tuple2<T1, T2>, ExpectingJoin2Stream<T1, T2>> {
 
-    public ExpectingJoin2Stream(ExpressionBuilder<Tuple2<T1, T2>, ExpectingJoin2Stream<T1, T2>> baseExpression) {
+    public ExpectingJoin2Stream(ExpressionBuilder<Tuple2<T1, T2>, Tuple0, ExpectingJoin2Stream<T1, T2>> baseExpression) {
         super(baseExpression);
     }
 
@@ -35,7 +36,7 @@ public class ExpectingJoin2Stream<T1, T2> extends InJoinExpressionExtender<Tuple
     }
 
     @Override
-    public StreamOp<Tuple2<T1, T2>> operatingStream() {
+    public StreamOp<Tuple2<T1, T2>, Tuple0> operatingStream() {
         CombinedStreamOp<T1, T2, Tuple2<T1, T2>> streamOp = (CombinedStreamOp<T1, T2, Tuple2<T1,T2>>) baseExpression.operatingStream();
 
         return new JoinStreamOp<>(streamOp.left(), streamOp.right(), baseExpression.condition(), Tuple2::new);
