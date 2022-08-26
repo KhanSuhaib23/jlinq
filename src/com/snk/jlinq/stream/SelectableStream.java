@@ -4,7 +4,6 @@ import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.function.MemberAccessor;
 import com.snk.jlinq.stream.pipeline.StreamOp;
 import com.snk.jlinq.stream.projection.InSelectExpectingComma1;
-import com.snk.jlinq.tuple.Tuple0;
 
 import java.util.stream.Stream;
 

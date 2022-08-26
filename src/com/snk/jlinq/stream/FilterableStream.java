@@ -1,16 +1,12 @@
 package com.snk.jlinq.stream;
 
-import com.snk.jlinq.data.Condition;
 import com.snk.jlinq.data.ExpressionValue;
 import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.function.MemberAccessor;
 import com.snk.jlinq.stream.expression.ExpressionBuilder;
 import com.snk.jlinq.stream.expression.GotPartialExpression;
-import com.snk.jlinq.stream.expression.InJoinExpressionExtender;
 import com.snk.jlinq.stream.expression.InWhereExpressionExtender;
-import com.snk.jlinq.stream.pipeline.FilterStreamOp;
 import com.snk.jlinq.stream.pipeline.StreamOp;
-import com.snk.jlinq.tuple.Tuple0;
 
 public class FilterableStream<GT, OT> extends SelectableStream<GT, OT> {
 

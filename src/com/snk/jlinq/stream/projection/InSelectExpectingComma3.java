@@ -3,8 +3,6 @@ package com.snk.jlinq.stream.projection;
 import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.function.MemberAccessor;
 import com.snk.jlinq.stream.pipeline.StreamOp;
-import com.snk.jlinq.tuple.Tuple0;
-import com.snk.jlinq.tuple.Tuple2;
 import com.snk.jlinq.tuple.Tuple3;
 
 import java.util.List;

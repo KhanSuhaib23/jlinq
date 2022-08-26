@@ -5,7 +5,6 @@ import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.function.MemberAccessor;
 import com.snk.jlinq.stream.pipeline.OrderedStreamOp;
 import com.snk.jlinq.stream.pipeline.StreamOp;
-import com.snk.jlinq.tuple.Tuple0;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,11 +29,11 @@ public class GotOrderByExpectingThen<GT, OT> extends FilterableStream<GT, OT> {
     }
 
     public <IN, OUT extends Comparable<OUT>> GotOrderByExpectingThen<GT, OT> then(Function1<IN, OUT> mapper) {
-        return new GotOrderByExpectingThen<GT, OT>(this, MemberAccessor.from(mapper));
+        return new GotOrderByExpectingThen<>(this, MemberAccessor.from(mapper));
     }
 
     public <IN, OUT extends Comparable<OUT>> GotOrderByExpectingThen<GT, OT> then(String alias, Function1<IN, OUT> mapper) {
-        return new GotOrderByExpectingThen<GT, OT>(this, MemberAccessor.from(alias, mapper));
+        return new GotOrderByExpectingThen<>(this, MemberAccessor.from(alias, mapper));
     }
 
     @Override

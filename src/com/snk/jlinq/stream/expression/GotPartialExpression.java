@@ -8,7 +8,6 @@ import com.snk.jlinq.stream.InWhereExpectingExpression;
 import com.snk.jlinq.stream.SelectableStream;
 import com.snk.jlinq.stream.pipeline.CombinedStreamOp;
 import com.snk.jlinq.stream.pipeline.StreamOp;
-import com.snk.jlinq.tuple.Tuple0;
 
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -41,8 +40,8 @@ public class GotPartialExpression<GT, OT, ET, EX, OS extends SelectableStream<GT
         return new GotPartialExpression<>(operatingStream, lValue, outputStreamConstructor);
     }
 
-    public static <T1, T2, OT, ET, JT extends InJoinExpressionExtender<OT, JT>> GotPartialExpression<OT, Tuple0, ET, InJoinExpressionExtender<OT, JT>, JT>
-    forJoin(StreamOp<T1, Tuple0> left, StreamOp<T2, Tuple0> right, ExpressionValue<ET> lValue, Function<ExpressionBuilder<OT, Tuple0, JT>, JT> outputStreamConstructor) {
+    public static <T1, T2, OT, ET, JT extends InJoinExpressionExtender<OT, JT>> GotPartialExpression<OT, OT, ET, InJoinExpressionExtender<OT, JT>, JT>
+    forJoin(StreamOp<T1, T1> left, StreamOp<T2, T2> right, ExpressionValue<ET> lValue, Function<ExpressionBuilder<OT, OT, JT>, JT> outputStreamConstructor) {
         return new GotPartialExpression<>(new CombinedStreamOp<>(left, right), lValue, outputStreamConstructor);
     }
 

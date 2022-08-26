@@ -1,9 +1,8 @@
 package com.snk.jlinq.stream.pipeline;
 
 import com.snk.jlinq.stream.EnrichedStream;
-import com.snk.jlinq.tuple.Tuple0;
 
-public class RootStreamOp<GT> implements StreamOp<GT, Tuple0> {
+public class RootStreamOp<GT> implements StreamOp<GT, GT> {
     private final EnrichedStream<GT> enrichedStream;
 
     public RootStreamOp(EnrichedStream<GT> enrichedStream) {

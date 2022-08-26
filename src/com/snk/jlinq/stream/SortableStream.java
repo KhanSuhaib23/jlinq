@@ -3,9 +3,6 @@ package com.snk.jlinq.stream;
 import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.function.MemberAccessor;
 import com.snk.jlinq.stream.pipeline.StreamOp;
-import com.snk.jlinq.tuple.Tuple0;
-
-import java.util.Comparator;
 
 public class SortableStream<GT, OT> extends FilterableStream<GT, OT> {
     public SortableStream(StreamOp<GT, OT> operatingStream) {

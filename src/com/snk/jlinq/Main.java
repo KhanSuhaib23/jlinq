@@ -60,6 +60,7 @@ public class Main {
                                                     .map(t3 -> new Tuple3<>(t3.v1().name(), t3.v2().name(), t3.v3().name()))
                                                     .collect(toList());
 
+
          */
 
         List<Tuple3<String, String, String>> t =

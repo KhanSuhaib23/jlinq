@@ -5,7 +5,6 @@ import com.snk.jlinq.stream.EnrichedStream;
 import com.snk.jlinq.stream.SelectStream;
 import com.snk.jlinq.stream.pipeline.StreamOp;
 import com.snk.jlinq.stream.util.StreamProjector;
-import com.snk.jlinq.tuple.Tuple0;
 
 import java.util.Arrays;
 import java.util.List;

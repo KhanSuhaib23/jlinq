@@ -2,10 +2,7 @@ package com.snk.jlinq.stream.projection;
 
 import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.function.MemberAccessor;
-import com.snk.jlinq.stream.EnrichedStream;
-import com.snk.jlinq.stream.SelectStream;
 import com.snk.jlinq.stream.pipeline.StreamOp;
-import com.snk.jlinq.tuple.Tuple0;
 
 public class InSelectExpectingComma1<RT1, GT, OT> extends ProjectedStream<RT1, GT, OT> {
     public InSelectExpectingComma1(StreamOp<GT, OT> operatingStream, MemberAccessor projection) {
