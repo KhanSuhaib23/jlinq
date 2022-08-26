@@ -5,17 +5,15 @@ import com.snk.jlinq.data.ExpressionValue;
 import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.function.MemberAccessor;
 import com.snk.jlinq.stream.EnrichedStream;
+import com.snk.jlinq.stream.ExpectingGroupBy;
 import com.snk.jlinq.stream.FilterableStream;
 import com.snk.jlinq.stream.SortableStream;
-import com.snk.jlinq.stream.pipeline.CombinedStreamOp;
-import com.snk.jlinq.stream.pipeline.FilterStreamOp;
-import com.snk.jlinq.stream.pipeline.JoinStreamOp;
-import com.snk.jlinq.stream.pipeline.StreamOp;
+import com.snk.jlinq.stream.pipeline.*;
 
 import java.util.stream.Stream;
 
 public class InJoinExpressionExtender<OT, JT extends InJoinExpressionExtender<OT, JT>>
-        extends SortableStream<OT, OT> implements ExpressionExtender<OT, OT, JT, InJoinExpressionExtender<OT, JT>> {
+        extends ExpectingGroupBy<OT> implements ExpressionExtender<OT, OT, JT, InJoinExpressionExtender<OT, JT>> {
     protected final ExpressionBuilder<OT, OT, JT> baseExpression;
 
     public InJoinExpressionExtender(ExpressionBuilder<OT, OT, JT> baseExpression) {

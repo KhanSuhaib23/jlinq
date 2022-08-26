@@ -1,5 +1,6 @@
 package com.snk.jlinq;
 
+import com.snk.jlinq.tuple.Tuple2;
 import com.snk.jlinq.tuple.Tuple3;
 
 import java.util.Arrays;
@@ -63,7 +64,7 @@ public class Main {
 
          */
 
-        List<Tuple3<String, String, String>> t =
+        List<Tuple3<String, String, String>> t1 =
                 from(employees.stream(), Employee.class)
                 .join("d", departments.stream(), Department.class)
                     .on(Employee::deptId).eq(Department::id)
@@ -73,6 +74,20 @@ public class Main {
                 .where(Department::name).eq("COMP")
                 .select(Employee::name).comma(Department::name).comma("m", Employee::name)
                 .collect(Collectors.toList());
+
+        System.out.println();
+
+        List<Tuple2<String, Integer>> t2 =
+                from(employees.stream(), Employee.class)
+                        .join("d", departments.stream(), Department.class)
+                        .on(Employee::deptId).eq(Department::id)
+                        .join("m", employees.stream(), Employee.class)
+                        .on(Employee::managerId).eq("m", Employee::id)
+                        .groupBy(Department::name).comma(Department::id)
+                        .orderBy(Department::id)
+                        .where(Department::id).eq(2)
+                        .select(Department::name).comma(Department::id)
+                        .collect(Collectors.toList());
 
         System.out.println();
 

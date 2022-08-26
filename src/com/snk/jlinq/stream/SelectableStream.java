@@ -38,6 +38,6 @@ public class SelectableStream<GT, OT> extends SelectStream<GT> {
 
     @Override
     public EnrichedStream<GT> outputStream() {
-        return operatingStream.outputStream();
+        return operatingStream().outputStream();
     }
 }
