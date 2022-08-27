@@ -5,6 +5,7 @@ import com.snk.jlinq.stream.EnrichedStream;
 import com.snk.jlinq.stream.SelectStream;
 import com.snk.jlinq.stream.pipeline.StreamOp;
 import com.snk.jlinq.stream.util.StreamProjector;
+import com.snk.jlinq.tuple.Tuple0;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.stream.Stream;
 
 // Projection are essentially taking some stream and selecting/projecting parts of it to the output
 // it operates on some operating type OT and returns some new type RT
-public abstract class ProjectedStream<RT, GT, OT> extends SelectStream<RT> {
+public abstract class ProjectedStream<RT, GT, OT> extends SelectStream<RT, RT> {
     private final StreamOp<GT, OT> operatingStream;
     private final List<MemberAccessor> projections;
 
@@ -41,12 +42,7 @@ public abstract class ProjectedStream<RT, GT, OT> extends SelectStream<RT> {
     }
 
     @Override
-    protected Stream<RT> underlyingStream() {
-        return outputStream().stream();
-    }
-
-    @Override
-    public EnrichedStream<RT> outputStream() {
+    public EnrichedStream<RT, RT> outputStream() {
         return StreamProjector.project(operatingStream.outputStream(), projections());
     }
 }

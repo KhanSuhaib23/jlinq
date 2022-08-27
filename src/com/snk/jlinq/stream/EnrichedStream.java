@@ -1,29 +1,43 @@
 package com.snk.jlinq.stream;
 
-import com.snk.jlinq.data.StreamAlias;
 import com.snk.jlinq.data.StreamContext;
 import com.snk.jlinq.function.MemberAccessor;
+import com.snk.jlinq.tuple.Pair;
+import com.snk.jlinq.tuple.Tuple0;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class EnrichedStream<T> {
+// TODO(suhaibnk): many modifications needed
+public class EnrichedStream<GT, OT> {
     private final List<MemberAccessor> orderedBy;
-    private final Stream<T> stream;
+    private final Stream<Pair<GT, Stream<OT>>> stream;
     private final StreamContext context;
 
-    public EnrichedStream(Stream<T> stream, StreamContext context, List<MemberAccessor> orderedBy) {
+    public EnrichedStream(Stream<Pair<GT, Stream<OT>>> stream, StreamContext context, List<MemberAccessor> orderedBy) {
         this.stream = stream;
         this.orderedBy = orderedBy;
         this.context = context;
     }
 
-    public static <T, R> EnrichedStream<R> withNewStream(EnrichedStream<T> underlyingStream, Stream<R> stream) {
-        return new EnrichedStream<>(stream, underlyingStream.context(), underlyingStream.orderedBy());
+    public static <GT, OT> EnrichedStream<GT, OT> pairedStream(Stream<Pair<GT, Stream<OT>>> stream, StreamContext context, List<MemberAccessor> orderedBy) {
+        return new EnrichedStream<>(stream, context, orderedBy);
     }
 
-    public Stream<T> stream() {
+    public static <GT> EnrichedStream<GT, GT> singleStream(Stream<GT> stream, StreamContext context, List<MemberAccessor> orderedBy) {
+        return new EnrichedStream<>(stream.map(x -> Pair.of(x, Stream.empty())), context, orderedBy);
+    }
+
+    public static <GT, OT, R> EnrichedStream<R, R> withNewStream(EnrichedStream<GT, OT> underlyingStream, Stream<R> stream) {
+        return EnrichedStream.singleStream(stream, underlyingStream.context(), underlyingStream.orderedBy());
+    }
+
+    public Stream<GT> singleStream() {
+        return stream.map(Pair::left);
+    }
+
+    public Stream<Pair<GT, Stream<OT>>> pairStream() {
         return stream;
     }
 

@@ -4,6 +4,7 @@ import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.function.MemberAccessor;
 import com.snk.jlinq.stream.pipeline.StreamOp;
 import com.snk.jlinq.stream.projection.InSelectExpectingComma1;
+import com.snk.jlinq.tuple.Tuple0;
 
 import java.util.stream.Stream;
 
@@ -12,7 +13,7 @@ import java.util.stream.Stream;
 // OT: Operating Type. Type of the stream on which we are operating on.
 // Select essentially apply some operation on type OT (type of underlying stream) to convert is to RT, which is the
 // type of the returned stream
-public class SelectableStream<GT, OT> extends SelectStream<GT> {
+public class SelectableStream<GT, OT> extends SelectStream<GT, OT> {
     protected final StreamOp<GT, OT> operatingStream;
 
     public SelectableStream(StreamOp<GT, OT> operatingStream) {
@@ -32,12 +33,7 @@ public class SelectableStream<GT, OT> extends SelectStream<GT> {
     }
 
     @Override
-    protected Stream<GT> underlyingStream() {
-        return outputStream().stream();
-    }
-
-    @Override
-    public EnrichedStream<GT> outputStream() {
+    public EnrichedStream<GT, OT> outputStream() {
         return operatingStream().outputStream();
     }
 }

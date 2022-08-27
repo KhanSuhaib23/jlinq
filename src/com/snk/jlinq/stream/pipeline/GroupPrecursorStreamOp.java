@@ -17,7 +17,7 @@ public class GroupPrecursorStreamOp<GT0, GTN, OT> implements StreamOp<GTN, OT> {
     }
 
     @Override
-    public EnrichedStream<GTN> outputStream() {
+    public EnrichedStream<GTN, OT> outputStream() {
         throw new RuntimeException("never called");
     }
 }

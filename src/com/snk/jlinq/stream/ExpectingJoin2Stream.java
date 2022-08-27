@@ -4,6 +4,7 @@ import com.snk.jlinq.data.StreamContext;
 import com.snk.jlinq.stream.expression.ExpressionBuilder;
 import com.snk.jlinq.stream.expression.InJoinExpressionExtender;
 import com.snk.jlinq.stream.pipeline.*;
+import com.snk.jlinq.tuple.Tuple0;
 import com.snk.jlinq.tuple.Tuple2;
 import com.snk.jlinq.tuple.Tuple3;
 
@@ -18,19 +19,19 @@ public class ExpectingJoin2Stream<T1, T2> extends InJoinExpressionExtender<Tuple
 
     public <TN> InJoinExpectingOn<Tuple2<T1, T2>, TN, Tuple3<T1, T2, TN>, ExpectingJoin3Stream<T1, T2, TN>> join(String alias, Stream<TN> stream, Class<?> clazz) {
         return new InJoinExpectingOn<>(operatingStream(),
-                new RootStreamOp<>(new EnrichedStream<>(stream, StreamContext.init(alias, clazz), Collections.emptyList())),
+                new RootStreamOp<>(EnrichedStream.singleStream(stream, StreamContext.init(alias, clazz), Collections.emptyList())),
                 (t1, v3) -> new Tuple3<>(t1, v3), baseExp -> new ExpectingJoin3Stream<>(baseExp));
     }
 
-    public <TN> InJoinExpectingOn<Tuple2<T1, T2>, TN, Tuple3<T1, T2, TN>, ExpectingJoin3Stream<T1, T2, TN>> join(String alias, EnrichedStream<TN> stream) {
+    public <TN> InJoinExpectingOn<Tuple2<T1, T2>, TN, Tuple3<T1, T2, TN>, ExpectingJoin3Stream<T1, T2, TN>> join(String alias, EnrichedStream<TN, Tuple0> stream) {
         return new InJoinExpectingOn<>(operatingStream(),
-                new RootStreamOp<>(new EnrichedStream<>(stream.stream(), StreamContext.init(alias, stream.context().classAt(1)), Collections.emptyList())),
+                new RootStreamOp<>(EnrichedStream.singleStream(stream.singleStream(), StreamContext.init(alias, stream.context().classAt(1)), Collections.emptyList())),
                 (t1, v3) -> new Tuple3<>(t1, v3), baseExp -> new ExpectingJoin3Stream<>(baseExp));
     }
 
-    public <TN> InJoinExpectingOn<Tuple2<T1, T2>, TN, Tuple3<T1, T2, TN>, ExpectingJoin3Stream<T1, T2, TN>> join(EnrichedStream<TN> stream) {
+    public <TN> InJoinExpectingOn<Tuple2<T1, T2>, TN, Tuple3<T1, T2, TN>, ExpectingJoin3Stream<T1, T2, TN>> join(EnrichedStream<TN, Tuple0> stream) {
         return new InJoinExpectingOn<>(operatingStream(),
-                new RootStreamOp<>(new EnrichedStream<>(stream.stream(), StreamContext.init(stream.context().classAt(1)), Collections.emptyList())),
+                new RootStreamOp<>(EnrichedStream.singleStream(stream.singleStream(), StreamContext.init(stream.context().classAt(1)), Collections.emptyList())),
                 (t1, v3) -> new Tuple3<>(t1, v3), baseExp -> new ExpectingJoin3Stream<>(baseExp));
     }
 

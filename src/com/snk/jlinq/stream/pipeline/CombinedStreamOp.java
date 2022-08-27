@@ -20,7 +20,7 @@ public class CombinedStreamOp<T1, T2, OT> implements StreamOp<OT, OT> {
     }
 
     @Override
-    public EnrichedStream<OT> outputStream() {
+    public EnrichedStream<OT, OT> outputStream() {
         throw new RuntimeException("never to be called");
     }
 }

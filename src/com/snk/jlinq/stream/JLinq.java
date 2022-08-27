@@ -8,6 +8,6 @@ import java.util.stream.Stream;
 
 public class JLinq {
     public static <T> ExpectingJoin1Stream<T> from(Stream<T> stream, Class<?> clazz) {
-        return new ExpectingJoin1Stream<>(new RootStreamOp<>(new EnrichedStream<>(stream, StreamContext.init(clazz), Collections.emptyList())));
+        return new ExpectingJoin1Stream<>(new RootStreamOp<>(EnrichedStream.singleStream(stream, StreamContext.init(clazz), Collections.emptyList())));
     }
 }

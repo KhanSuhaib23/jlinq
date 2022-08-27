@@ -22,14 +22,23 @@ public class StreamContext {
 
     private final Map<MemberAccessor, Function<Object, Object>> memberAccessMap;
     private final Map<StreamAlias, Function<Object, Object>> streamAliasMap;
-    private final Map<MemberAccessor, Function<Object, Object>> groupMemberAccessor;
+    private final Map<StreamAlias, Function<Object, Object>> groupMemberAccessor;
 
-    private StreamContext(Map<StreamAlias, Function<Object, Object>> streamAliasMap, Map<MemberAccessor, Function<Object, Object>> memberAccessMap) {
+    private static final Function<Object, Object> groupTypeAccessor = (Object p) -> ((Pair) p).left();
+
+    private StreamContext(Map<MemberAccessor, Function<Object, Object>> memberAccessMap, Map<StreamAlias, Function<Object, Object>> streamAliasMap, Map<StreamAlias, Function<Object, Object>> groupMemberAccessor) {
         this.memberAccessMap = memberAccessMap;
         this.streamAliasMap = streamAliasMap;
-        this.groupMemberAccessor = Collections.emptyMap();
+        this.groupMemberAccessor = groupMemberAccessor;
     }
 
+    private static StreamContext of(Map<MemberAccessor, Function<Object, Object>> memberAccessMap, Map<StreamAlias, Function<Object, Object>> groupMemberAccessor) {
+        return new StreamContext(memberAccessMap, Collections.emptyMap(), groupMemberAccessor);
+    }
+
+    private static StreamContext of(Map<StreamAlias, Function<Object, Object>> streamAliasMap) {
+        return new StreamContext(Collections.emptyMap(), streamAliasMap, Collections.emptyMap());
+    }
 
     public Function<Object, Object> get(MemberAccessor memberAccessor) {
         List<Pair<MemberAccessor, Function<Object, Object>>> l = memberAccessMap.entrySet().stream().map(Pair::of)
@@ -71,11 +80,11 @@ public class StreamContext {
     }
 
     public static StreamContext init(Class<?> clazz) {
-        return new StreamContext(Map.of(StreamAlias.of(clazz), Function.identity()), Collections.emptyMap());
+        return of(Map.of(StreamAlias.of(clazz), groupTypeAccessor.andThen(Function.identity())));
     }
 
     public static StreamContext init(String alias, Class<?> clazz) {
-        return new StreamContext(Map.of(StreamAlias.of(clazz, alias), Function.identity()), Collections.emptyMap());
+        return of(Map.of(StreamAlias.of(clazz, alias), groupTypeAccessor.andThen(Function.identity())));
     }
 
     public Class<?> classAt(int i) {
@@ -102,7 +111,7 @@ public class StreamContext {
 
         if (streamAliasMap.size() == 1) {
             streamAliasMap.entrySet().stream()
-                    .forEach(e -> newMap.put(e.getKey(), baseMapper.get(0)));
+                    .forEach(e -> newMap.put(e.getKey(), groupTypeAccessor.andThen(baseMapper.get(0))));
         } else {
             streamAliasMap.entrySet().stream()
                     .forEach(e -> newMap.put(e.getKey(), e.getValue()));
@@ -111,23 +120,24 @@ public class StreamContext {
         Iterator<StreamAlias> otherKeys = otherContext.streamAliasMap.keySet().iterator();
 
         while (otherKeys.hasNext()) {
-            newMap.put(otherKeys.next(), baseMapper.get(max++));
+            newMap.put(otherKeys.next(), groupTypeAccessor.andThen(baseMapper.get(max++)));
         }
 
-        return new StreamContext(newMap, Collections.emptyMap());
+        return of(newMap);
     }
 
     public StreamContext groupBy(List<MemberAccessor> groupBys) {
+
         if (groupBys.size() == 1) {
-            return new StreamContext(Collections.emptyMap(), Map.of(groupBys.get(0), Function.identity()));
+            return of(Map.of(groupBys.get(0), groupTypeAccessor.andThen(Function.identity())), streamAliasMap);
         }
         Map<MemberAccessor, Function<Object, Object>> memberAccessorFunctionMap = new HashMap<>();
         int i = 0;
         for (MemberAccessor groupBy : groupBys) {
-            memberAccessorFunctionMap.put(groupBy, baseMapper.get(i));
+            memberAccessorFunctionMap.put(groupBy, groupTypeAccessor.andThen(baseMapper.get(i)));
             i++;
         }
 
-        return new StreamContext(Collections.emptyMap(), memberAccessorFunctionMap);
+        return of(memberAccessorFunctionMap, streamAliasMap);
     }
 }

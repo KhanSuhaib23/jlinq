@@ -15,7 +15,7 @@ public class FilterStreamOp<GT, OT> implements StreamOp<GT, OT> {
     }
 
     @Override
-    public EnrichedStream<GT> outputStream() {
+    public EnrichedStream<GT, OT> outputStream() {
         return StreamFilter.streamFilter(baseStream.outputStream(), filterCondition);
     }
 }

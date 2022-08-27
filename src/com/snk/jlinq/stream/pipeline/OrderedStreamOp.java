@@ -16,7 +16,7 @@ public class OrderedStreamOp<GT, OT> implements StreamOp<GT, OT> {
         this.orderBys = orderBys;
     }
     @Override
-    public EnrichedStream<GT> outputStream() {
+    public EnrichedStream<GT, OT> outputStream() {
         return StreamOrderBy.orderBy(stream.outputStream(), orderBys);
     }
 }

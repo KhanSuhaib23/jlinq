@@ -1,10 +1,9 @@
 package com.snk.jlinq.stream.util;
 
 import com.snk.jlinq.function.MemberAccessor;
-import com.snk.jlinq.reflect.ReflectionUtil;
 import com.snk.jlinq.stream.EnrichedStream;
-import com.snk.jlinq.tuple.Tuple2;
-import com.snk.jlinq.tuple.Tuple3;
+import com.snk.jlinq.tuple.Pair;
+import com.snk.jlinq.tuple.Tuple0;
 import com.snk.jlinq.tuple.TupleUtil;
 
 import java.util.List;
@@ -13,8 +12,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class StreamProjector {
-    public static <RT, OT> EnrichedStream<RT> project(EnrichedStream<OT> enrichedStream, List<MemberAccessor> projections) {
-        Function<OT, RT> f = v -> {
+    public static <RT, GT, OT> EnrichedStream<RT, RT> project(EnrichedStream<GT, OT> enrichedStream, List<MemberAccessor> projections) {
+        Function<Pair<GT, Stream<OT>>, RT> f = v -> {
             List<Object> tupleObjects = projections.stream()
                     .map(m -> enrichedStream.accessMapper(m).apply(v))
                     .collect(Collectors.toList());
@@ -22,6 +21,6 @@ public class StreamProjector {
             return (RT) TupleUtil.createTuple(tupleObjects);
         };
 
-        return EnrichedStream.withNewStream(enrichedStream, enrichedStream.stream().map(f));
+        return EnrichedStream.withNewStream(enrichedStream, enrichedStream.pairStream().map(f));
     }
 }

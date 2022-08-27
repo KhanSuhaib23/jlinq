@@ -21,7 +21,7 @@ public class JoinStreamOp<T1, T2, OT> implements StreamOp<OT, OT> {
     }
 
     @Override
-    public EnrichedStream<OT> outputStream() {
+    public EnrichedStream<OT, OT> outputStream() {
         return StreamJoin.streamJoin(left.outputStream(), right.outputStream(), condition, mapper);
     }
 }
