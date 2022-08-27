@@ -40,6 +40,15 @@ public class StreamContext {
         return new StreamContext(Collections.emptyMap(), streamAliasMap, Collections.emptyMap());
     }
 
+    public Function<Object, Object> getAggregate(MemberAccessor memberAccessor) {
+        return groupMemberAccessor.entrySet().stream()
+                .filter(m -> m.getKey().equals(memberAccessor.streamAlias()))
+                .map(Map.Entry::getValue)
+                .map(f -> f.andThen(o -> ReflectionUtil.invoke(memberAccessor.method(), o)))
+                .findFirst()
+                .orElseThrow(RuntimeException::new);
+    }
+
     public Function<Object, Object> get(MemberAccessor memberAccessor) {
         List<Pair<MemberAccessor, Function<Object, Object>>> l = memberAccessMap.entrySet().stream().map(Pair::of)
                 .filter(p -> memberAccessor.streamAlias().canMatch(p.left().streamAlias()))
@@ -49,13 +58,13 @@ public class StreamContext {
         if (l.size() == 0) {
             return get(memberAccessor.streamAlias(), memberAccessor.method());
         } else if (l.size() == 1) {
-            return l.get(0).right();
+            return groupTypeAccessor.andThen(l.get(0).right());
         } else {
             return l.stream()
                     .filter(p -> p.left().streamAlias().name().isBlank())
                     .findFirst()
                     .map(Pair::right)
-                    .map(f -> f.andThen(o -> ReflectionUtil.invoke(memberAccessor.method(), o)))
+                    .map(f -> groupTypeAccessor.andThen(f).andThen(o -> ReflectionUtil.invoke(memberAccessor.method(), o)))
                     .orElseThrow(RuntimeException::new);
         }
     }
@@ -68,23 +77,23 @@ public class StreamContext {
         if (l.size() == 0) {
             throw new RuntimeException("No stream provided with definition " + alias);
         } else if (l.size() == 1) {
-            return l.get(0).right().andThen(o -> ReflectionUtil.invoke(method, o));
+            return groupTypeAccessor.andThen(l.get(0).right()).andThen(o -> ReflectionUtil.invoke(method, o));
         } else {
             return l.stream()
                     .filter(p -> p.left().name().isBlank())
                     .findFirst()
                     .map(Pair::right)
-                    .map(f -> f.andThen(o -> ReflectionUtil.invoke(method, o)))
+                    .map(f -> groupTypeAccessor.andThen(f).andThen(o -> ReflectionUtil.invoke(method, o)))
                     .orElseThrow(RuntimeException::new);
         }
     }
 
     public static StreamContext init(Class<?> clazz) {
-        return of(Map.of(StreamAlias.of(clazz), groupTypeAccessor.andThen(Function.identity())));
+        return of(Map.of(StreamAlias.of(clazz), Function.identity()));
     }
 
     public static StreamContext init(String alias, Class<?> clazz) {
-        return of(Map.of(StreamAlias.of(clazz, alias), groupTypeAccessor.andThen(Function.identity())));
+        return of(Map.of(StreamAlias.of(clazz, alias), Function.identity()));
     }
 
     public Class<?> classAt(int i) {
@@ -111,7 +120,7 @@ public class StreamContext {
 
         if (streamAliasMap.size() == 1) {
             streamAliasMap.entrySet().stream()
-                    .forEach(e -> newMap.put(e.getKey(), groupTypeAccessor.andThen(baseMapper.get(0))));
+                    .forEach(e -> newMap.put(e.getKey(), baseMapper.get(0)));
         } else {
             streamAliasMap.entrySet().stream()
                     .forEach(e -> newMap.put(e.getKey(), e.getValue()));
@@ -120,7 +129,7 @@ public class StreamContext {
         Iterator<StreamAlias> otherKeys = otherContext.streamAliasMap.keySet().iterator();
 
         while (otherKeys.hasNext()) {
-            newMap.put(otherKeys.next(), groupTypeAccessor.andThen(baseMapper.get(max++)));
+            newMap.put(otherKeys.next(), baseMapper.get(max++));
         }
 
         return of(newMap);
@@ -129,12 +138,12 @@ public class StreamContext {
     public StreamContext groupBy(List<MemberAccessor> groupBys) {
 
         if (groupBys.size() == 1) {
-            return of(Map.of(groupBys.get(0), groupTypeAccessor.andThen(Function.identity())), streamAliasMap);
+            return of(Map.of(groupBys.get(0), Function.identity()), streamAliasMap);
         }
         Map<MemberAccessor, Function<Object, Object>> memberAccessorFunctionMap = new HashMap<>();
         int i = 0;
         for (MemberAccessor groupBy : groupBys) {
-            memberAccessorFunctionMap.put(groupBy, groupTypeAccessor.andThen(baseMapper.get(i)));
+            memberAccessorFunctionMap.put(groupBy, baseMapper.get(i));
             i++;
         }
 

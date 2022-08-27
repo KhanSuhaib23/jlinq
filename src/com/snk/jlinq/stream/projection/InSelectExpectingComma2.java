@@ -19,4 +19,8 @@ public class InSelectExpectingComma2<RT1, RT2, GT, OT> extends ProjectedStream<T
     public <IN, OUT> InSelectExpectingComma3<RT1, RT2, OUT, GT, OT> comma(String alias, Function1<IN, OUT> mapper) {
         return new InSelectExpectingComma3<>(baseOperatingStream(), projections(), MemberAccessor.from(alias, mapper));
     }
+
+    public <IN, OUT> InSelectExpectingComma3<RT1, RT2, OUT, GT, OT> comma(MemberAccessor<OUT> memberAccessor) {
+        return new InSelectExpectingComma3<>(baseOperatingStream(), projections(), memberAccessor);
+    }
 }

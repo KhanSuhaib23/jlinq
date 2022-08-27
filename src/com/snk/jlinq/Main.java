@@ -1,5 +1,6 @@
 package com.snk.jlinq;
 
+import com.snk.jlinq.stream.AggregationFunction;
 import com.snk.jlinq.tuple.Tuple2;
 import com.snk.jlinq.tuple.Tuple3;
 
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.snk.jlinq.stream.AggregationFunction.*;
 import static com.snk.jlinq.stream.JLinq.from;
 
 public class Main {
@@ -77,17 +79,15 @@ public class Main {
 
         System.out.println();
 
-        List<Tuple2<String, Integer>> t2 =
+        List<Tuple2<String, List<String>>> t2 =
                 from(employees.stream(), Employee.class)
-                        .join("d", departments.stream(), Department.class)
+                    .join("d", departments.stream(), Department.class)
                         .on(Employee::deptId).eq(Department::id)
-                        .join("m", employees.stream(), Employee.class)
-                        .on(Employee::managerId).eq("m", Employee::id)
-                        .groupBy(Department::name).comma(Department::id)
-                        .orderBy(Department::id)
-                        .where(Department::id).eq(2)
-                        .select(Department::name).comma(Department::id)
-                        .collect(Collectors.toList());
+                    .groupBy(Department::name).comma(Department::id)
+                    .orderBy(Department::id)
+                    .where(Department::id).eq(2)
+                    .select(Department::name).comma(list(Employee::name)).comma(count(Employee::name))
+                    .collect(Collectors.toList());
 
         System.out.println();
 

@@ -2,6 +2,7 @@ package com.snk.jlinq.stream.projection;
 
 import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.function.MemberAccessor;
+import com.snk.jlinq.stream.AggregationFunction;
 import com.snk.jlinq.stream.pipeline.StreamOp;
 
 public class InSelectExpectingComma1<RT1, GT, OT> extends ProjectedStream<RT1, GT, OT> {
@@ -11,6 +12,10 @@ public class InSelectExpectingComma1<RT1, GT, OT> extends ProjectedStream<RT1, G
 
     public <IN, OUT> InSelectExpectingComma2<RT1, OUT, GT, OT> comma(Function1<IN, OUT> mapper) {
         return new InSelectExpectingComma2<>(baseOperatingStream(), projections(), MemberAccessor.from(mapper));
+    }
+
+    public <IN, OUT> InSelectExpectingComma2<RT1, OUT, GT, OT> comma(MemberAccessor<OUT> memberAccessor) {
+        return new InSelectExpectingComma2<>(baseOperatingStream(), projections(), memberAccessor);
     }
 
     public <IN, OUT> InSelectExpectingComma2<RT1, OUT, GT, OT> comma(String alias, Function1<IN, OUT> mapper) {

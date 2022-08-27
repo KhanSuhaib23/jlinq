@@ -1,17 +1,25 @@
 package com.snk.jlinq.function;
 
 import com.snk.jlinq.data.StreamAlias;
+import com.snk.jlinq.stream.AggregationFunction;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Objects;
 
 public class MemberAccessor<T> {
+    private final AggregationFunction.Type type;
     private final Method method;
     private final String alias;
 
-    public MemberAccessor(Method method, String alias) {
+    public MemberAccessor(Method method, String alias, AggregationFunction.Type type) {
+        this.type = type;
         this.method = method;
         this.alias = alias;
+    }
+
+    public AggregationFunction.Type type() {
+        return type;
     }
 
     public Method method() {
@@ -27,11 +35,19 @@ public class MemberAccessor<T> {
     }
 
     public static <IN, OUT> MemberAccessor<OUT> from(String alias, Function1<IN, OUT> function) {
-        return new MemberAccessor<>(MethodUtil.getMethodFromMethodReference(function), alias);
+        return new MemberAccessor<>(MethodUtil.getMethodFromMethodReference(function), alias, AggregationFunction.Type.NONE);
     }
 
     public static <IN, OUT> MemberAccessor<OUT> from(Function1<IN, OUT> function) {
-        return new MemberAccessor<>(MethodUtil.getMethodFromMethodReference(function), "");
+        return new MemberAccessor<>(MethodUtil.getMethodFromMethodReference(function), "", AggregationFunction.Type.NONE);
+    }
+
+    public static <IN, OUT> MemberAccessor<List<OUT>> list(Function1<IN, OUT> function) {
+        return new MemberAccessor<>(MethodUtil.getMethodFromMethodReference(function), "", AggregationFunction.Type.LIST);
+    }
+
+    public static <IN, OUT> MemberAccessor<List<OUT>> count(Function1<IN,OUT> mapper) {
+        return new MemberAccessor<>(MethodUtil.getMethodFromMethodReference(mapper), "", AggregationFunction.Type.COUNT);
     }
 
     @Override
