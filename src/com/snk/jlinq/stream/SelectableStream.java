@@ -4,6 +4,7 @@ import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.function.MemberAccessor;
 import com.snk.jlinq.stream.pipeline.StreamOp;
 import com.snk.jlinq.stream.projection.InSelectExpectingComma1;
+import com.snk.jlinq.stream.projection.InSelectExpectingComma2;
 import com.snk.jlinq.tuple.Tuple0;
 
 import java.util.stream.Stream;
@@ -26,6 +27,10 @@ public class SelectableStream<GT, OT> extends SelectStream<GT, OT> {
 
     public <IN, OUT> InSelectExpectingComma1<OUT, GT, OT> select(Function1<IN, OUT> mapper) {
         return new InSelectExpectingComma1<>(operatingStream(), MemberAccessor.from(mapper));
+    }
+
+    public <IN, OUT> InSelectExpectingComma1<OUT, GT, OT> select(MemberAccessor<OUT> memberAccessor) {
+        return new InSelectExpectingComma1<>(operatingStream(), memberAccessor);
     }
 
     public StreamOp<GT, OT> operatingStream() {

@@ -79,14 +79,14 @@ public class Main {
 
         System.out.println();
 
-        List<Tuple2<String, List<String>>> t2 =
+        List<Tuple3<Long, List<String>, Long>> t2 =
                 from(employees.stream(), Employee.class)
                     .join("d", departments.stream(), Department.class)
                         .on(Employee::deptId).eq(Department::id)
                     .groupBy(Department::name).comma(Department::id)
                     .orderBy(Department::id)
                     .where(Department::id).eq(2)
-                    .select(Department::name).comma(list(Employee::name)).comma(count(Employee::name))
+                    .select(count(Employee::id)).comma(list(Employee::name)).comma(count(Employee::name))
                     .collect(Collectors.toList());
 
         System.out.println();

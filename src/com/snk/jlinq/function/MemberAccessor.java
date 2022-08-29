@@ -46,7 +46,7 @@ public class MemberAccessor<T> {
         return new MemberAccessor<>(MethodUtil.getMethodFromMethodReference(function), "", AggregationFunction.Type.LIST);
     }
 
-    public static <IN, OUT> MemberAccessor<List<OUT>> count(Function1<IN,OUT> mapper) {
+    public static <IN, OUT> MemberAccessor<Long> count(Function1<IN,OUT> mapper) {
         return new MemberAccessor<>(MethodUtil.getMethodFromMethodReference(mapper), "", AggregationFunction.Type.COUNT);
     }
 

@@ -17,7 +17,7 @@ public class AggregationFunction {
         return MemberAccessor.list(mapper);
     }
 
-    public static <IN, OUT> MemberAccessor<List<OUT>> count(Function1<IN, OUT> mapper) {
+    public static <IN, OUT> MemberAccessor<Long> count(Function1<IN, OUT> mapper) {
         return MemberAccessor.count(mapper);
     }
 }
