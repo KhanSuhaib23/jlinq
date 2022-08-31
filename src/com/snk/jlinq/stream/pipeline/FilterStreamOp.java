@@ -2,7 +2,7 @@ package com.snk.jlinq.stream.pipeline;
 
 import com.snk.jlinq.data.Condition;
 import com.snk.jlinq.stream.EnrichedStream;
-import com.snk.jlinq.stream.util.StreamFilter;
+import com.snk.jlinq.stream.util.StreamOperations;
 
 
 public class FilterStreamOp<GT, OT> implements StreamOp<GT, OT> {
@@ -16,6 +16,6 @@ public class FilterStreamOp<GT, OT> implements StreamOp<GT, OT> {
 
     @Override
     public EnrichedStream<GT, OT> outputStream() {
-        return StreamFilter.streamFilter(baseStream.outputStream(), filterCondition);
+        return StreamOperations.where(baseStream.outputStream(), filterCondition);
     }
 }

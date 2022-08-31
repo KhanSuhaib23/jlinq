@@ -1,6 +1,7 @@
 package com.snk.jlinq.stream;
 
 import com.snk.jlinq.data.StreamContext;
+import com.snk.jlinq.stream.join.ExpectingJoin1Stream;
 import com.snk.jlinq.stream.pipeline.RootStreamOp;
 
 import java.util.Collections;

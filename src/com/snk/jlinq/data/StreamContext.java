@@ -1,7 +1,6 @@
 package com.snk.jlinq.data;
 
 import com.snk.jlinq.function.MemberAccessor;
-import com.snk.jlinq.function.MethodUtil;
 import com.snk.jlinq.reflect.ReflectionUtil;
 import com.snk.jlinq.tuple.*;
 
@@ -9,7 +8,6 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class StreamContext {
     private final static List<Function<Object, Object>> baseMapper =
@@ -20,24 +18,26 @@ public class StreamContext {
 
             );
 
+    private final Class<?> mainClass;
     private final Map<MemberAccessor, Function<Object, Object>> memberAccessMap;
     private final Map<StreamAlias, Function<Object, Object>> streamAliasMap;
     private final Map<StreamAlias, Function<Object, Object>> groupMemberAccessor;
 
     private static final Function<Object, Object> groupTypeAccessor = (Object p) -> ((Pair) p).left();
 
-    private StreamContext(Map<MemberAccessor, Function<Object, Object>> memberAccessMap, Map<StreamAlias, Function<Object, Object>> streamAliasMap, Map<StreamAlias, Function<Object, Object>> groupMemberAccessor) {
+    private StreamContext(Class<?> mainClass, Map<MemberAccessor, Function<Object, Object>> memberAccessMap, Map<StreamAlias, Function<Object, Object>> streamAliasMap, Map<StreamAlias, Function<Object, Object>> groupMemberAccessor) {
+        this.mainClass = mainClass;
         this.memberAccessMap = memberAccessMap;
         this.streamAliasMap = streamAliasMap;
         this.groupMemberAccessor = groupMemberAccessor;
     }
 
-    private static StreamContext of(Map<MemberAccessor, Function<Object, Object>> memberAccessMap, Map<StreamAlias, Function<Object, Object>> groupMemberAccessor) {
-        return new StreamContext(memberAccessMap, Collections.emptyMap(), groupMemberAccessor);
+    private static StreamContext of(Class<?> mainClass, Map<MemberAccessor, Function<Object, Object>> memberAccessMap, Map<StreamAlias, Function<Object, Object>> groupMemberAccessor) {
+        return new StreamContext(mainClass, memberAccessMap, Collections.emptyMap(), groupMemberAccessor);
     }
 
-    private static StreamContext of(Map<StreamAlias, Function<Object, Object>> streamAliasMap) {
-        return new StreamContext(Collections.emptyMap(), streamAliasMap, Collections.emptyMap());
+    private static StreamContext of(Class<?> mainClass, Map<StreamAlias, Function<Object, Object>> streamAliasMap) {
+        return new StreamContext(mainClass, Collections.emptyMap(), streamAliasMap, Collections.emptyMap());
     }
 
     public Function<Object, Object> getAggregate(MemberAccessor memberAccessor) {
@@ -89,20 +89,15 @@ public class StreamContext {
     }
 
     public static StreamContext init(Class<?> clazz) {
-        return of(Map.of(StreamAlias.of(clazz), Function.identity()));
+        return of(clazz, Map.of(StreamAlias.of(clazz), Function.identity()));
     }
 
     public static StreamContext init(String alias, Class<?> clazz) {
-        return of(Map.of(StreamAlias.of(clazz, alias), Function.identity()));
+        return of(clazz, Map.of(StreamAlias.of(clazz, alias), Function.identity()));
     }
 
-    public Class<?> classAt(int i) {
-        return streamAliasMap.entrySet()
-                .stream()
-                .filter(e -> e.getValue().equals(i))
-                .findFirst()
-                .map(a -> a.getKey().clazz())
-                .orElseThrow(RuntimeException::new);
+    public Class<?> mainClass() {
+        return mainClass;
     }
 
 
@@ -132,13 +127,13 @@ public class StreamContext {
             newMap.put(otherKeys.next(), baseMapper.get(max++));
         }
 
-        return of(newMap);
+        return of(mainClass, newMap);
     }
 
     public StreamContext groupBy(List<MemberAccessor> groupBys) {
 
         if (groupBys.size() == 1) {
-            return of(Map.of(groupBys.get(0), Function.identity()), streamAliasMap);
+            return of(mainClass, Map.of(groupBys.get(0), Function.identity()), streamAliasMap);
         }
         Map<MemberAccessor, Function<Object, Object>> memberAccessorFunctionMap = new HashMap<>();
         int i = 0;
@@ -147,6 +142,6 @@ public class StreamContext {
             i++;
         }
 
-        return of(memberAccessorFunctionMap, streamAliasMap);
+        return of(mainClass, memberAccessorFunctionMap, streamAliasMap);
     }
 }

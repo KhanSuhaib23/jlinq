@@ -13,27 +13,29 @@ import java.util.List;
 public class GotOrderByExpectingThen<GT, OT> extends FilterableStream<GT, OT> {
     private final List<MemberAccessor> orderBys;
 
-    public GotOrderByExpectingThen(StreamOp<GT, OT> operatingStream, List<MemberAccessor> orderBys) {
+    public GotOrderByExpectingThen(StreamOp<GT, OT> operatingStream, List<MemberAccessor> orderBy) {
         super(operatingStream);
-        this.orderBys = orderBys;
+        this.orderBys = orderBy;
     }
 
     public GotOrderByExpectingThen(StreamOp<GT, OT> operatingStream, MemberAccessor orderBy) {
-        super(operatingStream);
-        this.orderBys = Arrays.asList(orderBy);
+        this(operatingStream, Arrays.asList(orderBy));
     }
 
-    public GotOrderByExpectingThen(GotOrderByExpectingThen<GT, OT> base, MemberAccessor orderBy) {
-        super(base.operatingStream());
-        this.orderBys = ListUtil.addOne(base.orderBys, orderBy);
+    public GotOrderByExpectingThen(StreamOp<GT, OT> operatingStream, List<MemberAccessor> orderBy, MemberAccessor additionalOrderBy) {
+        this(operatingStream, ListUtil.addOne(orderBy, additionalOrderBy));
     }
 
     public <IN, OUT extends Comparable<OUT>> GotOrderByExpectingThen<GT, OT> then(Function1<IN, OUT> mapper) {
-        return new GotOrderByExpectingThen<>(this, MemberAccessor.from(mapper));
+        return then (MemberAccessor.from(mapper));
     }
 
     public <IN, OUT extends Comparable<OUT>> GotOrderByExpectingThen<GT, OT> then(String alias, Function1<IN, OUT> mapper) {
-        return new GotOrderByExpectingThen<>(this, MemberAccessor.from(alias, mapper));
+        return then(MemberAccessor.from(alias, mapper));
+    }
+
+    private <OUT extends Comparable<OUT>> GotOrderByExpectingThen<GT, OT> then(MemberAccessor<OUT> memberAccessor) {
+        return new GotOrderByExpectingThen<>(operatingStream, orderBys, memberAccessor);
     }
 
     @Override

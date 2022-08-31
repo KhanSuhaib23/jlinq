@@ -29,6 +29,10 @@ public class EnrichedStream<GT, OT> {
         return new EnrichedStream<>(stream.map(x -> Pair.of(x, Stream.empty())), context, orderedBy);
     }
 
+    public static <GT> EnrichedStream<GT, GT> singleStream(Stream<GT> stream, StreamContext context) {
+        return new EnrichedStream<>(stream.map(x -> Pair.of(x, Stream.empty())), context, Collections.emptyList());
+    }
+
     public static <GT, OT, R> EnrichedStream<R, R> withNewStream(EnrichedStream<GT, OT> underlyingStream, Stream<R> stream) {
         return EnrichedStream.singleStream(stream, underlyingStream.context(), underlyingStream.orderedBy());
     }
@@ -53,7 +57,12 @@ public class EnrichedStream<GT, OT> {
         return context.get(memberAccessor); // TODO: possible null pointer exception
     }
 
-    public boolean isOrderedBy(List<MemberAccessor> toOrderBy) {
+    public Function<Object, Object> aggregateMapper(MemberAccessor memberAccessor) {
+        return context.getAggregate(memberAccessor); // TODO: possible null pointer exception
+    }
+
+
+        public boolean isOrderedBy(List<MemberAccessor> toOrderBy) {
         if (toOrderBy.size() <= orderedBy.size()) {
             for (int i = 0; i < toOrderBy.size(); ++i) {
                 if (!toOrderBy.get(i).equals(orderedBy.get(i))) {

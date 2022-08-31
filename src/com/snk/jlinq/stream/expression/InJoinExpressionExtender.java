@@ -1,22 +1,17 @@
 package com.snk.jlinq.stream.expression;
 
-import com.snk.jlinq.data.Condition;
 import com.snk.jlinq.data.ExpressionValue;
 import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.function.MemberAccessor;
-import com.snk.jlinq.stream.EnrichedStream;
-import com.snk.jlinq.stream.ExpectingGroupBy;
-import com.snk.jlinq.stream.FilterableStream;
-import com.snk.jlinq.stream.SortableStream;
-import com.snk.jlinq.stream.pipeline.*;
+import com.snk.jlinq.stream.group.ExpectingGroupBy;
 
-import java.util.stream.Stream;
+public class InJoinExpressionExtender<OutputType, ExpectingJoinType extends InJoinExpressionExtender<OutputType, ExpectingJoinType>>
+        extends ExpectingGroupBy<OutputType>
+        implements ExpressionExtender<OutputType, OutputType, ExpectingJoinType,
+                                        InJoinExpressionExtender<OutputType, ExpectingJoinType>> {
+    protected final ExpressionBuilder<OutputType, OutputType, ExpectingJoinType> baseExpression;
 
-public class InJoinExpressionExtender<OT, JT extends InJoinExpressionExtender<OT, JT>>
-        extends ExpectingGroupBy<OT> implements ExpressionExtender<OT, OT, JT, InJoinExpressionExtender<OT, JT>> {
-    protected final ExpressionBuilder<OT, OT, JT> baseExpression;
-
-    public InJoinExpressionExtender(ExpressionBuilder<OT, OT, JT> baseExpression) {
+    public InJoinExpressionExtender(ExpressionBuilder<OutputType, OutputType, ExpectingJoinType> baseExpression) {
         super(baseExpression.operatingStream());
         this.baseExpression = baseExpression;
     }
@@ -26,41 +21,41 @@ public class InJoinExpressionExtender<OT, JT extends InJoinExpressionExtender<OT
     }
 
     @Override
-    public <IN, OUT> GotPartialExpression<OT, OT, OUT, InJoinExpressionExtender<OT, JT>, JT> and(String alias, Function1<IN, OUT> mapper) {
+    public <IN, OUT> GotPartialExpression<OutputType, OutputType, OUT, ExpectingJoinType> and(String alias, Function1<IN, OUT> mapper) {
         return and(ExpressionValue.fromExtractor(MemberAccessor.from(alias, mapper)));
     }
 
     @Override
-    public <IN, OUT> GotPartialExpression<OT, OT, OUT, InJoinExpressionExtender<OT, JT>, JT> and(Function1<IN, OUT> mapper) {
+    public <IN, OUT> GotPartialExpression<OutputType, OutputType, OUT, ExpectingJoinType> and(Function1<IN, OUT> mapper) {
         return and(ExpressionValue.fromExtractor(MemberAccessor.from(mapper)));
     }
 
     @Override
-    public <OUT> GotPartialExpression<OT, OT, OUT, InJoinExpressionExtender<OT, JT>, JT> and(OUT value) {
+    public <OUT> GotPartialExpression<OutputType, OutputType, OUT, ExpectingJoinType> and(OUT value) {
         return and(ExpressionValue.fromScalar(value));
     }
 
     @Override
-    public <IN, OUT> GotPartialExpression<OT, OT, OUT, InJoinExpressionExtender<OT, JT>, JT> or(String alias, Function1<IN, OUT> mapper) {
+    public <IN, OUT> GotPartialExpression<OutputType, OutputType, OUT, ExpectingJoinType> or(String alias, Function1<IN, OUT> mapper) {
         return or(ExpressionValue.fromExtractor(MemberAccessor.from(alias, mapper)));
     }
 
     @Override
-    public <IN, OUT> GotPartialExpression<OT, OT, OUT, InJoinExpressionExtender<OT, JT>, JT> or(Function1<IN, OUT> mapper) {
+    public <IN, OUT> GotPartialExpression<OutputType, OutputType, OUT, ExpectingJoinType> or(Function1<IN, OUT> mapper) {
         return or(ExpressionValue.fromExtractor(MemberAccessor.from(mapper)));
     }
 
     @Override
-    public <OUT> GotPartialExpression<OT, OT, OUT, InJoinExpressionExtender<OT, JT>, JT> or(OUT value) {
+    public <OUT> GotPartialExpression<OutputType, OutputType, OUT, ExpectingJoinType> or(OUT value) {
         return or(ExpressionValue.fromScalar(value));
     }
 
-    private <OUT> GotPartialExpression<OT, OT, OUT, InJoinExpressionExtender<OT, JT>, JT> and(ExpressionValue<OUT> expressionValue) {
-        return new GotPartialExpression<>(baseExpression, expressionValue, Condition::and);
+    private <OUT> GotPartialExpression<OutputType, OutputType, OUT, ExpectingJoinType> and(ExpressionValue<OUT> expressionValue) {
+        return GotPartialExpression.extendExpression(baseExpression, expressionValue, ConditionBuilder.AND);
     }
 
-    private <OUT> GotPartialExpression<OT, OT, OUT, InJoinExpressionExtender<OT, JT>, JT> or(ExpressionValue<OUT> expressionValue) {
-        return new GotPartialExpression<>(baseExpression, expressionValue, Condition::or);
+    private <OUT> GotPartialExpression<OutputType, OutputType, OUT, ExpectingJoinType> or(ExpressionValue<OUT> expressionValue) {
+        return GotPartialExpression.extendExpression(baseExpression, expressionValue, ConditionBuilder.OR);
     }
 
 }

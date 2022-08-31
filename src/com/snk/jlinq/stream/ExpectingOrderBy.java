@@ -4,16 +4,20 @@ import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.function.MemberAccessor;
 import com.snk.jlinq.stream.pipeline.StreamOp;
 
-public class SortableStream<GT, OT> extends FilterableStream<GT, OT> {
-    public SortableStream(StreamOp<GT, OT> operatingStream) {
+public class ExpectingOrderBy<GT, OT> extends FilterableStream<GT, OT> {
+    public ExpectingOrderBy(StreamOp<GT, OT> operatingStream) {
         super(operatingStream);
     }
 
     public <IN, OUT extends Comparable<OUT>> GotOrderByExpectingThen<GT, OT> orderBy(Function1<IN, OUT> mapper) {
-        return new GotOrderByExpectingThen<>(operatingStream(), MemberAccessor.from(mapper));
+        return orderBy(MemberAccessor.from(mapper));
     }
 
     public <IN, OUT extends Comparable<OUT>> GotOrderByExpectingThen<GT, OT> orderBy(String alias, Function1<IN, OUT> mapper) {
-        return new GotOrderByExpectingThen<>(operatingStream(), MemberAccessor.from(alias, mapper));
+        return orderBy(MemberAccessor.from(alias, mapper));
+    }
+
+    private <OUT extends Comparable<OUT>> GotOrderByExpectingThen<GT, OT> orderBy(MemberAccessor<OUT> memberAccessor) {
+        return new GotOrderByExpectingThen<>(operatingStream(), memberAccessor);
     }
 }

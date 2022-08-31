@@ -2,26 +2,23 @@ package com.snk.jlinq.stream.pipeline;
 
 import com.snk.jlinq.data.Condition;
 import com.snk.jlinq.stream.EnrichedStream;
-import com.snk.jlinq.stream.util.StreamJoin;
+import com.snk.jlinq.stream.util.StreamOperations;
 
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
-public class JoinStreamOp<T1, T2, OT> implements StreamOp<OT, OT> {
-    private final StreamOp<T1, T1> left;
-    private final StreamOp<T2, T2> right;
+
+public class JoinStreamOp<T1, T2, OutputType> extends JoinStreamBuilderOp<T1, T2, OutputType> {
     private final Condition condition;
-    private final BiFunction<T1, T2, OT> mapper;
+    private final BiFunction<T1, T2, OutputType> mapper;
 
-    public JoinStreamOp(StreamOp<T1, T1> left, StreamOp<T2, T2> right, Condition condition, BiFunction<T1, T2, OT> mapper) {
-        this.left = left;
-        this.right = right;
+    public JoinStreamOp(JoinStreamBuilderOp<T1, T2, OutputType> builder, Condition condition, BiFunction<T1, T2, OutputType> mapper) {
+        super(builder.left(), builder.right());
         this.condition = condition;
         this.mapper = mapper;
     }
 
     @Override
-    public EnrichedStream<OT, OT> outputStream() {
-        return StreamJoin.streamJoin(left.outputStream(), right.outputStream(), condition, mapper);
+    public EnrichedStream<OutputType, OutputType> outputStream() {
+        return StreamOperations.join(left.outputStream(), right.outputStream(), condition, mapper);
     }
 }

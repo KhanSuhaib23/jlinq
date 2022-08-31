@@ -5,60 +5,77 @@ import com.snk.jlinq.data.ExpressionValue;
 import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.function.MemberAccessor;
 import com.snk.jlinq.stream.InWhereExpectingExpression;
-import com.snk.jlinq.stream.SelectableStream;
-import com.snk.jlinq.stream.pipeline.CombinedStreamOp;
+import com.snk.jlinq.stream.ExpectingSelect;
+import com.snk.jlinq.stream.pipeline.JoinStreamBuilderOp;
 import com.snk.jlinq.stream.pipeline.StreamOp;
 
-import java.util.function.BinaryOperator;
 import java.util.function.Function;
 
-// BT = OT & RT base type, I want returned
-// ET is expression type, type of the expression
-// EX is the type of expression extender
-public class GotPartialExpression<GT, OT, ET, EX, OS extends SelectableStream<GT, OT>> {
-    private final ExpressionValue<ET> lValue;
-    private final ExpressionBuilder<GT, OT, OS> baseExpression;
-    private final BinaryOperator<Condition> conditionTransformer;
+public class GotPartialExpression<GroupedType, OriginalType, ExpressionType, OutputStreamType extends ExpectingSelect<GroupedType, OriginalType>> {
+    private final ExpressionValue<ExpressionType> lValue;
+    private final ExpressionBuilder<GroupedType, OriginalType, OutputStreamType> baseExpression;
+    private final ConditionBuilder conditionBuilder;
 
-    public GotPartialExpression(StreamOp<GT, OT> operatingStream, ExpressionValue<ET> lValue,
-                                Function<ExpressionBuilder<GT, OT, OS>, OS> outputStreamConstructor) {
+    private GotPartialExpression(StreamOp<GroupedType, OriginalType> operatingStream,
+                                ExpressionValue<ExpressionType> lValue,
+                                Function<ExpressionBuilder<GroupedType, OriginalType, OutputStreamType>, OutputStreamType> outputStreamConstructor) {
         this.baseExpression = new ExpressionBuilder<>(operatingStream, null, outputStreamConstructor);
         this.lValue = lValue;
-        this.conditionTransformer = null;
+        this.conditionBuilder = null;
     }
 
-    public GotPartialExpression(ExpressionBuilder<GT, OT, OS> baseExpression, ExpressionValue<ET> lValue,
-                                BinaryOperator<Condition> conditionTransformer) {
+    private GotPartialExpression(ExpressionBuilder<GroupedType, OriginalType, OutputStreamType> baseExpression,
+                                ExpressionValue<ExpressionType> lValue,
+                                ConditionBuilder conditionBuilder) {
         this.baseExpression = new ExpressionBuilder<>(baseExpression);
         this.lValue = lValue;
-        this.conditionTransformer = conditionTransformer;
+        this.conditionBuilder = conditionBuilder;
+    }
+
+    public static <GroupedType, OriginalType, ExpressionType, OutputType extends ExpectingSelect<GroupedType, OriginalType>>
+            GotPartialExpression<GroupedType, OriginalType, ExpressionType, OutputType>
+    beginExpression(StreamOp<GroupedType, OriginalType> operatingStream,
+                    ExpressionValue<ExpressionType> lValue,
+                    Function<ExpressionBuilder<GroupedType, OriginalType, OutputType>, OutputType> outputStreamConstructor) {
+            return new GotPartialExpression<>(operatingStream, lValue, outputStreamConstructor);
+    }
+
+    public static <GroupedType, OriginalType, ExpressionType, OutputType extends ExpectingSelect<GroupedType, OriginalType>>
+    GotPartialExpression<GroupedType, OriginalType, ExpressionType, OutputType>
+    extendExpression(ExpressionBuilder<GroupedType, OriginalType, OutputType> baseExpression,
+                     ExpressionValue<ExpressionType> lValue,
+                     ConditionBuilder conditionBuilder) {
+        return new GotPartialExpression<>(baseExpression, lValue, conditionBuilder);
     }
 
 
-    public static <GT, OT, ET> GotPartialExpression<GT, OT, ET, InWhereExpressionExtender<GT, OT>, InWhereExpectingExpression<GT, OT>>
-    forSelect(StreamOp<GT, OT> operatingStream, ExpressionValue<ET> lValue, Function<ExpressionBuilder<GT, OT, InWhereExpectingExpression<GT, OT>>, InWhereExpectingExpression<GT, OT>> outputStreamConstructor) {
-        return new GotPartialExpression<>(operatingStream, lValue, outputStreamConstructor);
+    public static <GroupedType, OriginalType, ExpressionType>
+    GotPartialExpression<GroupedType, OriginalType, ExpressionType, InWhereExpectingExpression<GroupedType, OriginalType>>
+    forSelect(StreamOp<GroupedType, OriginalType> operatingStream, ExpressionValue<ExpressionType> lValue, Function<ExpressionBuilder<GroupedType, OriginalType, InWhereExpectingExpression<GroupedType, OriginalType>>, InWhereExpectingExpression<GroupedType, OriginalType>> outputStreamConstructor) {
+        return beginExpression(operatingStream, lValue, outputStreamConstructor);
     }
 
-    public static <T1, T2, OT, ET, JT extends InJoinExpressionExtender<OT, JT>> GotPartialExpression<OT, OT, ET, InJoinExpressionExtender<OT, JT>, JT>
-    forJoin(StreamOp<T1, T1> left, StreamOp<T2, T2> right, ExpressionValue<ET> lValue, Function<ExpressionBuilder<OT, OT, JT>, JT> outputStreamConstructor) {
-        return new GotPartialExpression<>(new CombinedStreamOp<>(left, right), lValue, outputStreamConstructor);
+    public static <T1, T2, OutputType, ExpressionType, ExpectingJoinType extends InJoinExpressionExtender<OutputType, ExpectingJoinType>>
+    GotPartialExpression<OutputType, OutputType, ExpressionType, ExpectingJoinType>
+    forJoin(StreamOp<T1, T1> left, StreamOp<T2, T2> right, ExpressionValue<ExpressionType> lValue,
+            Function<ExpressionBuilder<OutputType, OutputType, ExpectingJoinType>, ExpectingJoinType> outputStreamConstructor) {
+        return beginExpression(new JoinStreamBuilderOp<>(left, right), lValue, outputStreamConstructor);
     }
 
-    public <IN> OS eq(String alias, Function1<IN, ET> mapper) {
+    public <IN> OutputStreamType eq(String alias, Function1<IN, ExpressionType> mapper) {
         return eq(ExpressionValue.fromExtractor(MemberAccessor.from(alias, mapper)));
     }
 
-    public <IN> OS eq(Function1<IN, ET> mapper) {
+    public <IN> OutputStreamType eq(Function1<IN, ExpressionType> mapper) {
         return eq(ExpressionValue.fromExtractor(MemberAccessor.from(mapper)));
     }
 
-    public <IN> OS eq(ET value) {
+    public OutputStreamType eq(ExpressionType value) {
         return eq(ExpressionValue.fromScalar(value));
     }
 
 
-    private OS eq(ExpressionValue<ET> expressionValue) {
-        return new ExpressionBuilder<>(baseExpression, Condition.eq(lValue, expressionValue), conditionTransformer).outputStream();
+    private OutputStreamType eq(ExpressionValue<ExpressionType> expressionValue) {
+        return new ExpressionBuilder<>(baseExpression, Condition.eq(lValue, expressionValue), conditionBuilder).outputStream();
     }
 }

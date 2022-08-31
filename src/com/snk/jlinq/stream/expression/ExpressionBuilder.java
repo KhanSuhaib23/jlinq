@@ -1,37 +1,33 @@
 package com.snk.jlinq.stream.expression;
 
 import com.snk.jlinq.data.Condition;
-import com.snk.jlinq.stream.SelectableStream;
+import com.snk.jlinq.stream.ExpectingSelect;
 import com.snk.jlinq.stream.pipeline.StreamOp;
 
-import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
 import java.util.function.Function;
 
-public class ExpressionBuilder<GT, OT, OS extends SelectableStream<GT, OT>> {
-    private final StreamOp<GT, OT> operatingStream;
+public class ExpressionBuilder<GroupedType, OriginalType, OutputStreamType extends ExpectingSelect<GroupedType, OriginalType>> {
+    private final StreamOp<GroupedType, OriginalType> operatingStream;
     private final Condition condition;
-    private final Function<ExpressionBuilder<GT, OT, OS>, OS> outputStreamConstructor;
+    private final Function<ExpressionBuilder<GroupedType, OriginalType, OutputStreamType>, OutputStreamType> outputStreamConstructor;
 
-    public ExpressionBuilder(ExpressionBuilder<GT, OT, OS> baseExpression) {
-        this.operatingStream = baseExpression.operatingStream();
-        this.condition = baseExpression.condition();
-        this.outputStreamConstructor = baseExpression.outputStreamConstructor();
-    }
-
-    public ExpressionBuilder(StreamOp<GT, OT> operatingStream, Condition condition, Function<ExpressionBuilder<GT, OT, OS>, OS> outputStreamConstructor) {
+    public ExpressionBuilder(StreamOp<GroupedType, OriginalType> operatingStream, Condition condition, Function<ExpressionBuilder<GroupedType, OriginalType, OutputStreamType>, OutputStreamType> outputStreamConstructor) {
         this.operatingStream = operatingStream;
         this.condition = condition;
         this.outputStreamConstructor = outputStreamConstructor;
     }
 
-    public ExpressionBuilder(ExpressionBuilder<GT, OT, OS> baseExpression, Condition newCondition, BinaryOperator<Condition> conditionTransformer) {
-        this.operatingStream = baseExpression.operatingStream();
-        this.outputStreamConstructor = baseExpression.outputStreamConstructor();
-        this.condition = baseExpression.condition() == null ? newCondition : conditionTransformer.apply(baseExpression.condition(), newCondition);
+    public ExpressionBuilder(ExpressionBuilder<GroupedType, OriginalType, OutputStreamType> baseExpression) {
+        this(baseExpression.operatingStream, baseExpression.condition, baseExpression.outputStreamConstructor);
     }
 
-    public StreamOp<GT, OT> operatingStream() {
+    public ExpressionBuilder(ExpressionBuilder<GroupedType, OriginalType, OutputStreamType> baseExpression, Condition newCondition, ConditionBuilder conditionBuilder) {
+        this(baseExpression.operatingStream,
+                baseExpression.condition == null ? newCondition : conditionBuilder.build(baseExpression.condition, newCondition),
+                baseExpression.outputStreamConstructor);
+    }
+
+    public StreamOp<GroupedType, OriginalType> operatingStream() {
         return operatingStream;
     }
 
@@ -39,11 +35,7 @@ public class ExpressionBuilder<GT, OT, OS extends SelectableStream<GT, OT>> {
         return condition;
     }
 
-    public Function<ExpressionBuilder<GT, OT, OS>, OS> outputStreamConstructor() {
-        return outputStreamConstructor;
-    }
-
-    public OS outputStream() {
+    public OutputStreamType outputStream() {
         return outputStreamConstructor.apply(this);
     }
 

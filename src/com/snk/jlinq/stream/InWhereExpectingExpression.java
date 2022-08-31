@@ -7,6 +7,4 @@ public class InWhereExpectingExpression<GT, OT> extends InWhereExpressionExtende
     public InWhereExpectingExpression(ExpressionBuilder<GT, OT, InWhereExpectingExpression<GT, OT>> baseExpression) {
         super(baseExpression);
     }
-
-
 }

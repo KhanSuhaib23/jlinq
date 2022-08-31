@@ -1,14 +1,14 @@
 package com.snk.jlinq.stream.projection;
 
-import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.function.MemberAccessor;
 import com.snk.jlinq.stream.pipeline.StreamOp;
 import com.snk.jlinq.tuple.Tuple3;
 
 import java.util.List;
 
-public class InSelectExpectingComma3<RT1, RT2, RT3, GT, OT> extends ProjectedStream<Tuple3<RT1, RT2, RT3>, GT, OT> {
-    public InSelectExpectingComma3(StreamOp<GT, OT> operatingStream, List<MemberAccessor> projections, MemberAccessor additionalProjection) {
+public class InSelectExpectingComma3<SelectType1, SelectType2, SelectType3, GroupedType, OriginalType>
+        extends ProjectedStream<Tuple3<SelectType1, SelectType2, SelectType3>, GroupedType, OriginalType> {
+    public InSelectExpectingComma3(StreamOp<GroupedType, OriginalType> operatingStream, List<MemberAccessor> projections, MemberAccessor additionalProjection) {
         super(operatingStream, projections, additionalProjection);
     }
 }
