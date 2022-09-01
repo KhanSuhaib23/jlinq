@@ -3,7 +3,6 @@ package com.snk.jlinq;
 import com.snk.jlinq.udt.Tuple3;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.snk.jlinq.api.AggregationFunction.count;
@@ -36,34 +35,15 @@ public class Main {
                 new Employee(12, "NAN2", 2, 2),
                 new Employee(13, "TEN2", 1, 2),
                 new Employee(14, "PAK2", 3, 3)
-        ).collect(Collectors.toList());
+        ).toList();
 
         List<Department> departments = Stream.of(
                 new Department(1, "COMP"),
                 new Department(2, "IT"),
-                new Department(3, "EXTC")
-        ).collect(Collectors.toList());
+                new Department(3, "ELECTRONIC")
+        ).toList();
 
-        /*
-        Stream<Tuple2<Employee, Department>> employeeDepartment = join(employees.stream(), department.stream())
-                                               .on((e, d) -> e.deptId() == d.id())
-                                               .map((e, d) -> new Tuple2<>(e, d))
-                                               .stream();
-
-        Stream<Tuple3<Employee, Department, Employee>> t = join(employeeDepartment, employees.stream())
-                                                            .on((t2, e) -> t2.v1().managerId() == e.id())
-                                                            .map((t2, d) -> new Tuple3<>(t2.v1(), t2.v2(), d))
-                                                            .stream();
-
-        Stream<Tuple3<String, String, String>> r = t
-                                                    .filter(t3 -> t3.v2().name().equals("COMP"))
-                                                    .sorted(Comparator.comparing(t3 -> t3.v1().name()).thenComparing(t3 -> t3.v3().name()))
-                                                    .map(t3 -> new Tuple3<>(t3.v1().name(), t3.v2().name(), t3.v3().name()))
-                                                    .collect(toList());
-
-
-         */
-
+        @SuppressWarnings("unused")
         List<Tuple3<String, String, String>> t1 =
                 from(employees.stream(), Employee.class)
                 .join("d", departments.stream(), Department.class)
@@ -73,10 +53,11 @@ public class Main {
                 .orderBy(Employee::name).then("m", Employee::name)
                 .where(Department::name).eq("COMP")
                 .select(Employee::name).comma(Department::name).comma("m", Employee::name)
-                .collect(Collectors.toList());
+                .toList();
 
         System.out.println();
 
+        @SuppressWarnings("unused")
         List<Tuple3<Long, List<String>, Long>> t2 =
                 from(employees.stream(), Employee.class)
                     .join("d", departments.stream(), Department.class)
@@ -85,7 +66,7 @@ public class Main {
                     .orderBy(Department::id)
                     .where(Department::id).eq(2)
                     .select(count(Employee::id)).comma(list(Employee::name)).comma(count(Employee::name))
-                    .collect(Collectors.toList());
+                    .toList();
 
         System.out.println();
 
