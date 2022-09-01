@@ -1,16 +1,14 @@
 package com.snk.jlinq;
 
-import com.snk.jlinq.stream.AggregationFunction;
-import com.snk.jlinq.tuple.Tuple2;
-import com.snk.jlinq.tuple.Tuple3;
+import com.snk.jlinq.udt.Tuple3;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.snk.jlinq.stream.AggregationFunction.*;
-import static com.snk.jlinq.stream.JLinq.from;
+import static com.snk.jlinq.api.AggregationFunction.count;
+import static com.snk.jlinq.api.AggregationFunction.list;
+import static com.snk.jlinq.api.JLinq.from;
 
 public class Main {
 

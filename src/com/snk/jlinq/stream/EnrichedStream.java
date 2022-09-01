@@ -1,11 +1,9 @@
 package com.snk.jlinq.stream;
 
-import com.snk.jlinq.data.StreamContext;
-import com.snk.jlinq.function.MemberAccessor;
-import com.snk.jlinq.tuple.Pair;
-import com.snk.jlinq.tuple.Tuple0;
+import com.snk.jlinq.udt.Pair;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
