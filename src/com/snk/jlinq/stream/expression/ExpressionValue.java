@@ -9,22 +9,22 @@ public abstract class ExpressionValue<T> {
         return new Scalar<>(value);
     }
 
-    public static <T> ExpressionValue<T> fromExtractor(DataSelector<T> extractor) {
+    public static <T> ExpressionValue<T> fromExtractor(DataSelector extractor) {
         return new Extractor<>(extractor);
     }
 
     public abstract <R> T getValue(StreamContext streamContext, R in);
 
     public static class Extractor<T> extends ExpressionValue<T> {
-        private final DataSelector<T> reference;
+        private final DataSelector reference;
 
-        public Extractor(DataSelector<T> reference) {
+        public Extractor(DataSelector reference) {
             this.reference = reference;
         }
 
         @Override
         public <R> T getValue(StreamContext streamContext, R in) {
-            return (T) streamContext.get(reference).apply(in);
+            return streamContext.extractValue(reference, in);
         }
     }
 

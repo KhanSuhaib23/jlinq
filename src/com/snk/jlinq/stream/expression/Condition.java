@@ -9,6 +9,10 @@ public abstract class Condition {
         return new BooleanExpression<>(left, right, ExpressionType.EQ);
     }
 
+    public static <T> Condition neq(ExpressionValue<T> left, ExpressionValue<T> right) {
+        return new BooleanExpression<>(left, right, ExpressionType.NEQ);
+    }
+
     public Condition and(Condition other) {
         return new InternalNode(this, other, BooleanOperator.AND);
     }

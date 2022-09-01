@@ -12,6 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class StreamContext {
+    @SuppressWarnings("rawtypes")
     private final static List<Function<Object, Object>> baseMapper =
             Arrays.asList(
                     (Object t) -> ((Tuple1) t).v1(),
@@ -25,6 +26,7 @@ public class StreamContext {
     private final List2<StreamAlias, Function<Object, Object>> streamAliasMap;
     private final List2<StreamAlias, Function<Object, Object>> groupMemberAccessor;
 
+    @SuppressWarnings("rawtypes")
     private static final Function<Object, Object> groupTypeAccessor = (Object p) -> ((Pair) p).left();
 
     private StreamContext(Class<?> mainClass, List2<DataSelector, Function<Object, Object>> memberAccessMap,
@@ -45,6 +47,11 @@ public class StreamContext {
         return new StreamContext(mainClass, List2.empty(), streamAliasMap, List2.empty());
     }
 
+    @SuppressWarnings("unchecked")
+    public <IN, OUT> OUT extractValue(DataSelector selector, IN data) {
+        return (OUT) get(selector).apply(data);
+    }
+
     public Function<Object, Object> getAggregate(DataSelector selector) {
         return groupMemberAccessor.stream()
                 .filter(m -> m.left().equals(selector.streamAlias()))
@@ -57,8 +64,7 @@ public class StreamContext {
     public Function<Object, Object> get(DataSelector selector) {
         List<Pair<DataSelector, Function<Object, Object>>> l = memberAccessMap.stream()
                 .filter(p -> selector.streamAlias().canMatch(p.left().streamAlias()))
-                .filter(p -> p.left().method().equals(selector.method()))
-                .collect(Collectors.toList());
+                .filter(p -> p.left().method().equals(selector.method())).toList();
 
         if (l.size() == 0) {
             return get(selector.streamAlias(), selector.method());
@@ -76,8 +82,7 @@ public class StreamContext {
 
     public Function<Object, Object> get(StreamAlias alias, Method method) {
         List<Pair<StreamAlias, Function<Object, Object>>> l = streamAliasMap.stream()
-                .filter(p -> alias.canMatch(p.left()))
-                .collect(Collectors.toList());
+                .filter(p -> alias.canMatch(p.left())).toList();
 
         if (l.size() == 0) {
             throw new RuntimeException("No stream provided with definition " + alias);
@@ -115,7 +120,7 @@ public class StreamContext {
         int max = streamAliasMap.size();
 
         otherContext.streamAliasMap.streamLeft()
-                .filter(k -> keys.contains(k))
+                .filter(keys::contains)
                 .forEach(k -> {
                     throw new RuntimeException("Stream Alias " + k + " already exists in context");
                 });
@@ -126,7 +131,7 @@ public class StreamContext {
             streamAliasMap.streamLeft()
                     .forEach(k -> newList.add(k, baseMapper.get(0)));
         } else {
-            streamAliasMap.stream()
+            streamAliasMap
                     .forEach(e -> newList.add(e.left(), e.right()));
         }
 

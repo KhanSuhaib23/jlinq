@@ -1,11 +1,14 @@
 package com.snk.jlinq.stream.expression;
 
+import com.snk.jlinq.util.CodeUtil;
+
 import java.util.function.BiFunction;
 
 public enum ExpressionType {
-    EQ(Object::equals);
+    EQ(Object::equals),
+    NEQ(CodeUtil.negate(Object::equals));
 
-    private BiFunction<Object, Object, Boolean> op;
+    private final BiFunction<Object, Object, Boolean> op;
 
     ExpressionType(BiFunction<Object, Object, Boolean> op) {
         this.op = op;

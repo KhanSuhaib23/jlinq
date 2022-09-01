@@ -24,11 +24,13 @@ public class StreamOperations {
     }
 
     public static <OT, GT> EnrichedStream<GT, OT> groupBy(EnrichedStream<OT, OT> stream, List<DataSelector> groupBys) {
+
         Stream<Pair<GT, Stream<OT>>> os = stream.pairStream()
-                .map(t -> Pair.of((GT) Tuple.create(groupBys.stream()
-                        .map(a -> stream.accessMapper(a).apply(t)).collect(Collectors.toList())), t.left()))
+                .map(t -> new Pair<GT, OT>(
+                        Tuple.create(groupBys.stream().map(a -> stream.context().extractValue(a, t)).toList()),
+                        t.left()))
                 .collect(Collectors.groupingBy(
-                        p -> p.left(),
+                        Pair::left,
                         Collectors.toList()))
                 .entrySet().stream()
                 .map(e -> Pair.of(e.getKey(), e.getValue().stream().map(Pair::right)));
@@ -37,7 +39,7 @@ public class StreamOperations {
     }
 
     public static <T1, T2, OT> EnrichedStream<OT, OT> join(EnrichedStream<T1, T1> left, EnrichedStream<T2, T2> right, Condition condition, BiFunction<T1, T2, OT> mapper) {
-        List<Pair<T2, Stream<T2>>> t2 = right.pairStream().collect(Collectors.toList());
+        List<Pair<T2, Stream<T2>>> t2 = right.pairStream().toList();
         StreamContext newStreamContext = left.context().merge(right.context());
         Predicate<Pair<OT, Stream<OT>>> predicate = v -> condition.value(newStreamContext, v);
 
@@ -47,21 +49,23 @@ public class StreamOperations {
         return EnrichedStream.singleStream(stream, newStreamContext, Collections.emptyList());
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static <GT, OT> int compare(EnrichedStream<GT, OT> stream, DataSelector selector, Pair<GT, Stream<OT>> v1, Pair<GT, Stream<OT>> v2) {
+        Comparable c1 = stream.context().extractValue(selector, v1);
+        Comparable c2 = stream.context().extractValue(selector, v2);
+
+        return c1.compareTo(c2);
+    }
+
     public static <GT, OT> EnrichedStream<GT, OT> orderBy(EnrichedStream<GT, OT> stream, List<DataSelector> orderBys) {
         if (stream.isOrderedBy(orderBys)) {
             return stream;
         } else {
             Comparator<Pair<GT, Stream<OT>>> comparator = (v1, v2) -> {
                 for (DataSelector orderBy : orderBys) {
-                    Comparable c1 = (Comparable) stream.accessMapper(orderBy).apply(v1);
-                    Comparable c2 = (Comparable) stream.accessMapper(orderBy).apply(v2);
-                    int c = c1.compareTo(c2);
-
-                    if (c != 0) {
-                        return c;
-                    }
+                    int c = compare(stream, orderBy, v1, v2);
+                    if (c != 0) { return c; }
                 }
-
                 return 0;
             };
 
@@ -85,23 +89,23 @@ public class StreamOperations {
             for (int i = 0; i < projections.size(); ++i) {
                 DataSelector m = projections.get(i);
                 switch (m.type()) {
-                    case LIST:
-                        List l = new ArrayList();
+                    case LIST -> {
+                        List<Object> l = new ArrayList<>();
                         map.put(i, l);
                         mapper.put(i, (a, o) -> {
-                            List list = (List) a;
+                            List<Object> list = CodeUtil.cast(a);
                             list.add(o);
                             return list;
                         });
-                        break;
-                    case COUNT:
+                    }
+                    case COUNT -> {
                         Integer in = 0;
                         map.put(i, in);
                         mapper.put(i, (a, o) -> {
                             Integer i1 = (Integer) a;
                             return i1 + 1;
                         });
-                        break;
+                    }
                 }
             }
 
@@ -120,7 +124,7 @@ public class StreamOperations {
                     .map(Map.Entry::getValue)
                     .collect(Collectors.toList());
 
-            return (RT) Tuple.create(tupleObjects);
+            return Tuple.create(tupleObjects);
         };
 
         return EnrichedStream.withNewStream(enrichedStream, enrichedStream.pairStream().map(f));

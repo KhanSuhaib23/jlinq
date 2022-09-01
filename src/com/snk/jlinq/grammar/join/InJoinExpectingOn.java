@@ -30,7 +30,7 @@ public class InJoinExpectingOn<T1, T2, OutputType, JoinExtendType extends InJoin
     }
 
     public <OUT> GotPartialExpression<OutputType, OutputType, OUT, JoinExtendType> on(ExpressionValue<OUT> expressionValue) {
-        return GotPartialExpression.forJoin(original, join, expressionValue, (baseExpression) -> createJoinedStreamFromConditions(baseExpression));
+        return GotPartialExpression.forJoin(original, join, expressionValue, this::createJoinedStreamFromConditions);
     }
 
     private JoinExtendType createJoinedStreamFromConditions(ExpressionBuilder<OutputType, OutputType, JoinExtendType> baseExpression) {

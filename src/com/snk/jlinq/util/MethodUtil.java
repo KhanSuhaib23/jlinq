@@ -15,6 +15,7 @@ public class MethodUtil {
                 ).orElseThrow(() -> new RuntimeException("Cannot find method writeReplace method on the function. Use a Serialized lambda."));
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T invoke(Method method, Object object, Object ...params) {
         try {
             method.setAccessible(true);

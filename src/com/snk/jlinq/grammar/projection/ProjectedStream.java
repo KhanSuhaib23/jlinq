@@ -7,7 +7,7 @@ import com.snk.jlinq.stream.operation.StreamOp;
 import com.snk.jlinq.util.ListUtil;
 import com.snk.jlinq.util.StreamOperations;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class ProjectedStream<SelectType, GroupedType, OriginalType> extends SelectStream<SelectType, SelectType> {
@@ -20,7 +20,7 @@ public abstract class ProjectedStream<SelectType, GroupedType, OriginalType> ext
     }
 
     public ProjectedStream(StreamOp<GroupedType, OriginalType> operatingStream, DataSelector projection) {
-        this(operatingStream, Arrays.asList(projection));
+        this(operatingStream, Collections.singletonList(projection));
     }
 
     public ProjectedStream(StreamOp<GroupedType, OriginalType> operatingStream, List<DataSelector> projections, DataSelector additionalProjection) {

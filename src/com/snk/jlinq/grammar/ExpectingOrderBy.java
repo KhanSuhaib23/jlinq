@@ -17,7 +17,7 @@ public class ExpectingOrderBy<GroupedType, OriginalType> extends FilterableStrea
         return orderBy(DataSelector.from(alias, mapper));
     }
 
-    private <OUT extends Comparable<OUT>> GotOrderByExpectingThen<GroupedType, OriginalType> orderBy(DataSelector<OUT> selector) {
+    private GotOrderByExpectingThen<GroupedType, OriginalType> orderBy(DataSelector selector) {
         return new GotOrderByExpectingThen<>(operatingStream(), selector);
     }
 }

@@ -21,7 +21,7 @@ public class InSelectExpectingComma2<SelectType1, SelectType2, GroupedType, Orig
         return comma(DataSelector.from(alias, mapper));
     }
 
-    public <IN, OUT> InSelectExpectingComma3<SelectType1, SelectType2, OUT, GroupedType, OriginalType> comma(DataSelector<OUT> selector) {
+    public <OUT> InSelectExpectingComma3<SelectType1, SelectType2, OUT, GroupedType, OriginalType> comma(DataSelector selector) {
         return new InSelectExpectingComma3<>(baseOperatingStream(), projections(), selector);
     }
 }

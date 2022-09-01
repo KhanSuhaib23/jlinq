@@ -6,7 +6,7 @@ import com.snk.jlinq.stream.operation.OrderedStreamOp;
 import com.snk.jlinq.stream.operation.StreamOp;
 import com.snk.jlinq.util.ListUtil;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class GotOrderByExpectingThen<GroupedType, OriginalType> extends FilterableStream<GroupedType, OriginalType> {
@@ -18,7 +18,7 @@ public class GotOrderByExpectingThen<GroupedType, OriginalType> extends Filterab
     }
 
     public GotOrderByExpectingThen(StreamOp<GroupedType, OriginalType> operatingStream, DataSelector orderBy) {
-        this(operatingStream, Arrays.asList(orderBy));
+        this(operatingStream, Collections.singletonList(orderBy));
     }
 
     public GotOrderByExpectingThen(StreamOp<GroupedType, OriginalType> operatingStream, List<DataSelector> orderBy, DataSelector additionalOrderBy) {
@@ -26,14 +26,14 @@ public class GotOrderByExpectingThen<GroupedType, OriginalType> extends Filterab
     }
 
     public <IN, OUT extends Comparable<OUT>> GotOrderByExpectingThen<GroupedType, OriginalType> then(Function1<IN, OUT> mapper) {
-        return then (DataSelector.from(mapper));
+        return then(DataSelector.from(mapper));
     }
 
     public <IN, OUT extends Comparable<OUT>> GotOrderByExpectingThen<GroupedType, OriginalType> then(String alias, Function1<IN, OUT> mapper) {
         return then(DataSelector.from(alias, mapper));
     }
 
-    private <OUT extends Comparable<OUT>> GotOrderByExpectingThen<GroupedType, OriginalType> then(DataSelector<OUT> selector) {
+    private GotOrderByExpectingThen<GroupedType, OriginalType> then(DataSelector selector) {
         return new GotOrderByExpectingThen<>(operatingStream, orderBys, selector);
     }
 

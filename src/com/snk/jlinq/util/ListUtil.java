@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ListUtil {
+    @SafeVarargs
     public static <T> List<T> concat(List<T> list, T ...add) {
         return Stream.concat(list.stream(), Arrays.stream(add)).collect(Collectors.toList());
     }

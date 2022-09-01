@@ -79,4 +79,21 @@ public class GotPartialExpression<GroupedType, OriginalType, ExpressionType, Out
     private OutputStreamType eq(ExpressionValue<ExpressionType> expressionValue) {
         return new ExpressionBuilder<>(baseExpression, Condition.eq(lValue, expressionValue), conditionBuilder).outputStream();
     }
+
+    public <IN> OutputStreamType neq(String alias, Function1<IN, ExpressionType> mapper) {
+        return eq(ExpressionValue.fromExtractor(DataSelector.from(alias, mapper)));
+    }
+
+    public <IN> OutputStreamType neq(Function1<IN, ExpressionType> mapper) {
+        return eq(ExpressionValue.fromExtractor(DataSelector.from(mapper)));
+    }
+
+    public OutputStreamType neq(ExpressionType value) {
+        return eq(ExpressionValue.fromScalar(value));
+    }
+
+
+    private OutputStreamType neq(ExpressionValue<ExpressionType> expressionValue) {
+        return new ExpressionBuilder<>(baseExpression, Condition.neq(lValue, expressionValue), conditionBuilder).outputStream();
+    }
 }

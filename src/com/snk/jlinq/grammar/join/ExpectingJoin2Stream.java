@@ -33,7 +33,7 @@ public class ExpectingJoin2Stream<T1, T2> extends InJoinExpressionExtender<Tuple
     join(String alias, EnrichedStream<NewType, NewType> stream) {
         return new InJoinExpectingOn<>(operatingStream(),
                 new RootStreamOp<>(EnrichedStream.singleStream(stream.singleStream(), StreamContext.init(alias, stream.context().classAt(0)), Collections.emptyList())),
-                baseExp -> new ExpectingJoin3Stream<>(baseExp));
+                ExpectingJoin3Stream::new);
     }
 
     @Override

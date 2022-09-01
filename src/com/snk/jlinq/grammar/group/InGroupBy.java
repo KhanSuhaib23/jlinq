@@ -6,7 +6,7 @@ import com.snk.jlinq.stream.operation.GroupedStreamBuilderOp;
 import com.snk.jlinq.stream.operation.StreamOp;
 import com.snk.jlinq.util.ListUtil;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class InGroupBy<GroupedType, OutputType> extends ExpectingOrderBy<GroupedType, OutputType> {
@@ -19,7 +19,7 @@ public class InGroupBy<GroupedType, OutputType> extends ExpectingOrderBy<Grouped
 
     public InGroupBy(StreamOp<GroupedType, OutputType> operatingStream, DataSelector groupBys) {
         super(operatingStream);
-        this.groupBys = Arrays.asList(groupBys);
+        this.groupBys = Collections.singletonList(groupBys);
     }
 
     public InGroupBy(StreamOp<GroupedType, OutputType> operatingStream, List<DataSelector> groupBys, DataSelector additionalGroupBy) {
