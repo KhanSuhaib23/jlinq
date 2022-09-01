@@ -3,7 +3,7 @@ package com.snk.jlinq.grammar.expression;
 import com.snk.jlinq.function.ConditionBuilder;
 import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.grammar.group.ExpectingGroupBy;
-import com.snk.jlinq.stream.MemberAccessor;
+import com.snk.jlinq.stream.DataSelector;
 import com.snk.jlinq.stream.expression.ExpressionValue;
 
 public class InJoinExpressionExtender<OutputType, ExpectingJoinType extends InJoinExpressionExtender<OutputType, ExpectingJoinType>>
@@ -17,18 +17,19 @@ public class InJoinExpressionExtender<OutputType, ExpectingJoinType extends InJo
         this.baseExpression = baseExpression;
     }
 
+    // TODO(suhaibnk): Can't rename OT/JT to OutputType/ExpectingJoinType for some reason (works fine in WhereExpressionExtender
     public static <OT, JT extends InJoinExpressionExtender<OT, JT>> InJoinExpressionExtender<OT, JT> of(ExpressionBuilder<OT, OT, JT> baseExpression) {
         return new InJoinExpressionExtender<>(baseExpression);
     }
 
     @Override
     public <IN, OUT> GotPartialExpression<OutputType, OutputType, OUT, ExpectingJoinType> and(String alias, Function1<IN, OUT> mapper) {
-        return and(ExpressionValue.fromExtractor(MemberAccessor.from(alias, mapper)));
+        return and(ExpressionValue.fromExtractor(DataSelector.from(alias, mapper)));
     }
 
     @Override
     public <IN, OUT> GotPartialExpression<OutputType, OutputType, OUT, ExpectingJoinType> and(Function1<IN, OUT> mapper) {
-        return and(ExpressionValue.fromExtractor(MemberAccessor.from(mapper)));
+        return and(ExpressionValue.fromExtractor(DataSelector.from(mapper)));
     }
 
     @Override
@@ -38,12 +39,12 @@ public class InJoinExpressionExtender<OutputType, ExpectingJoinType extends InJo
 
     @Override
     public <IN, OUT> GotPartialExpression<OutputType, OutputType, OUT, ExpectingJoinType> or(String alias, Function1<IN, OUT> mapper) {
-        return or(ExpressionValue.fromExtractor(MemberAccessor.from(alias, mapper)));
+        return or(ExpressionValue.fromExtractor(DataSelector.from(alias, mapper)));
     }
 
     @Override
     public <IN, OUT> GotPartialExpression<OutputType, OutputType, OUT, ExpectingJoinType> or(Function1<IN, OUT> mapper) {
-        return or(ExpressionValue.fromExtractor(MemberAccessor.from(mapper)));
+        return or(ExpressionValue.fromExtractor(DataSelector.from(mapper)));
     }
 
     @Override

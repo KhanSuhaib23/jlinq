@@ -4,36 +4,36 @@ import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.grammar.expression.ExpressionBuilder;
 import com.snk.jlinq.grammar.expression.GotPartialExpression;
 import com.snk.jlinq.grammar.expression.InJoinExpressionExtender;
-import com.snk.jlinq.stream.MemberAccessor;
+import com.snk.jlinq.stream.DataSelector;
 import com.snk.jlinq.stream.expression.ExpressionValue;
 import com.snk.jlinq.stream.operation.StreamOp;
 
 import java.util.function.Function;
 
-public class InJoinExpectingOn<T1, T2, OT, JT extends InJoinExpressionExtender<OT, JT>> {
+public class InJoinExpectingOn<T1, T2, OutputType, JoinExtendType extends InJoinExpressionExtender<OutputType, JoinExtendType>> {
     private final StreamOp<T1, T1> original;
     private final StreamOp<T2, T2> join;
-    private final Function<ExpressionBuilder<OT, OT, JT>, JT> joinConstructor;
+    private final Function<ExpressionBuilder<OutputType, OutputType, JoinExtendType>, JoinExtendType> joinConstructor;
 
-    public InJoinExpectingOn(StreamOp<T1, T1> original, StreamOp<T2, T2> join, Function<ExpressionBuilder<OT, OT, JT>, JT> joinConstructor) {
+    public InJoinExpectingOn(StreamOp<T1, T1> original, StreamOp<T2, T2> join, Function<ExpressionBuilder<OutputType, OutputType, JoinExtendType>, JoinExtendType> joinConstructor) {
         this.original = original;
         this.join = join;
         this.joinConstructor = joinConstructor;
     }
 
-    public <IN, OUT> GotPartialExpression<OT, OT, OUT, JT> on(String alias, Function1<IN, OUT> mapper) {
-        return on(ExpressionValue.fromExtractor(MemberAccessor.from(alias, mapper)));
+    public <IN, OUT> GotPartialExpression<OutputType, OutputType, OUT, JoinExtendType> on(String alias, Function1<IN, OUT> mapper) {
+        return on(ExpressionValue.fromExtractor(DataSelector.from(alias, mapper)));
     }
 
-    public <IN, OUT> GotPartialExpression<OT, OT, OUT, JT> on(Function1<IN, OUT> mapper) {
-        return on(ExpressionValue.fromExtractor(MemberAccessor.from(mapper)));
+    public <IN, OUT> GotPartialExpression<OutputType, OutputType, OUT, JoinExtendType> on(Function1<IN, OUT> mapper) {
+        return on(ExpressionValue.fromExtractor(DataSelector.from(mapper)));
     }
 
-    public <IN, OUT> GotPartialExpression<OT, OT, OUT, JT> on(ExpressionValue<OUT> expressionValue) {
+    public <OUT> GotPartialExpression<OutputType, OutputType, OUT, JoinExtendType> on(ExpressionValue<OUT> expressionValue) {
         return GotPartialExpression.forJoin(original, join, expressionValue, (baseExpression) -> createJoinedStreamFromConditions(baseExpression));
     }
 
-    private JT createJoinedStreamFromConditions(ExpressionBuilder<OT, OT, JT> baseExpression) {
+    private JoinExtendType createJoinedStreamFromConditions(ExpressionBuilder<OutputType, OutputType, JoinExtendType> baseExpression) {
         return joinConstructor.apply(baseExpression);
     }
 

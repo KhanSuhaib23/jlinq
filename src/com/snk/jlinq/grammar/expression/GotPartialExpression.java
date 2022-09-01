@@ -4,7 +4,7 @@ import com.snk.jlinq.function.ConditionBuilder;
 import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.grammar.ExpectingSelect;
 import com.snk.jlinq.grammar.InWhereExpectingExpression;
-import com.snk.jlinq.stream.MemberAccessor;
+import com.snk.jlinq.stream.DataSelector;
 import com.snk.jlinq.stream.expression.Condition;
 import com.snk.jlinq.stream.expression.ExpressionValue;
 import com.snk.jlinq.stream.operation.JoinStreamBuilderOp;
@@ -64,11 +64,11 @@ public class GotPartialExpression<GroupedType, OriginalType, ExpressionType, Out
     }
 
     public <IN> OutputStreamType eq(String alias, Function1<IN, ExpressionType> mapper) {
-        return eq(ExpressionValue.fromExtractor(MemberAccessor.from(alias, mapper)));
+        return eq(ExpressionValue.fromExtractor(DataSelector.from(alias, mapper)));
     }
 
     public <IN> OutputStreamType eq(Function1<IN, ExpressionType> mapper) {
-        return eq(ExpressionValue.fromExtractor(MemberAccessor.from(mapper)));
+        return eq(ExpressionValue.fromExtractor(DataSelector.from(mapper)));
     }
 
     public OutputStreamType eq(ExpressionType value) {

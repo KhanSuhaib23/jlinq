@@ -15,15 +15,18 @@ public class ExpectingJoin1Stream<T> extends ExpectingOrderBy<T, T> {
         super(operatingStream);
     }
 
-    public <TN> InJoinExpectingOn<T, TN, Tuple2<T, TN>, ExpectingJoin2Stream<T, TN>> join(String alias, Stream<TN> stream, Class<?> clazz) {
+    public <NewType> InJoinExpectingOn<T, NewType, Tuple2<T, NewType>, ExpectingJoin2Stream<T, NewType>> join(String alias, Stream<NewType> stream, Class<?> clazz) {
         return join(alias, EnrichedStream.singleStream(stream, StreamContext.init(alias, clazz)));
     }
 
-    public <TN> InJoinExpectingOn<T, TN, Tuple2<T, TN>, ExpectingJoin2Stream<T, TN>> join(EnrichedStream<TN, TN> stream) {
+    public <JoinStreamType> InJoinExpectingOn<T, JoinStreamType, Tuple2<T, JoinStreamType>, ExpectingJoin2Stream<T, JoinStreamType>> join(EnrichedStream<JoinStreamType, JoinStreamType> stream) {
         return join("", stream);
     }
 
-    public <TN> InJoinExpectingOn<T, TN, Tuple2<T, TN>, ExpectingJoin2Stream<T, TN>> join(String alias, EnrichedStream<TN, TN> stream) {
+    public <JoinStreamType> InJoinExpectingOn<T, JoinStreamType,
+            Tuple2<T, JoinStreamType>,
+            ExpectingJoin2Stream<T, JoinStreamType>>
+    join(String alias, EnrichedStream<JoinStreamType, JoinStreamType> stream) {
         return new InJoinExpectingOn<>(operatingStream(),
                 new RootStreamOp<>(EnrichedStream.singleStream(stream.singleStream(), StreamContext.init(alias, stream.context().classAt(0)), Collections.emptyList())),
                 baseExp -> new ExpectingJoin2Stream<>(baseExp));

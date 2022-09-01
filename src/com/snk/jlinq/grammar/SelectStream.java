@@ -5,11 +5,11 @@ import com.snk.jlinq.stream.PassThroughStream;
 
 import java.util.stream.Stream;
 
-public abstract class SelectStream<GT, OT> extends PassThroughStream<GT> {
+public abstract class SelectStream<GroupedType, OriginalType> extends PassThroughStream<GroupedType> {
     @Override
-    protected Stream<GT> underlyingStream() {
+    protected Stream<GroupedType> underlyingStream() {
         return outputStream().singleStream();
     }
 
-    public abstract EnrichedStream<GT, OT> outputStream();
+    public abstract EnrichedStream<GroupedType, OriginalType> outputStream();
 }

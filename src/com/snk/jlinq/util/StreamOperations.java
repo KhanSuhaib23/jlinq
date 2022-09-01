@@ -1,8 +1,8 @@
 package com.snk.jlinq.util;
 
 import com.snk.jlinq.api.AggregationFunction;
+import com.snk.jlinq.stream.DataSelector;
 import com.snk.jlinq.stream.EnrichedStream;
-import com.snk.jlinq.stream.MemberAccessor;
 import com.snk.jlinq.stream.StreamContext;
 import com.snk.jlinq.stream.expression.Condition;
 import com.snk.jlinq.udt.Pair;
@@ -23,7 +23,7 @@ public class StreamOperations {
         return EnrichedStream.pairedStream(stream.pairStream().filter(predicate), stream.context(), stream.orderedBy());
     }
 
-    public static <OT, GT> EnrichedStream<GT, OT> groupBy(EnrichedStream<OT, OT> stream, List<MemberAccessor> groupBys) {
+    public static <OT, GT> EnrichedStream<GT, OT> groupBy(EnrichedStream<OT, OT> stream, List<DataSelector> groupBys) {
         Stream<Pair<GT, Stream<OT>>> os = stream.pairStream()
                 .map(t -> Pair.of((GT) Tuple.create(groupBys.stream()
                         .map(a -> stream.accessMapper(a).apply(t)).collect(Collectors.toList())), t.left()))
@@ -47,12 +47,12 @@ public class StreamOperations {
         return EnrichedStream.singleStream(stream, newStreamContext, Collections.emptyList());
     }
 
-    public static <GT, OT> EnrichedStream<GT, OT> orderBy(EnrichedStream<GT, OT> stream, List<MemberAccessor> orderBys) {
+    public static <GT, OT> EnrichedStream<GT, OT> orderBy(EnrichedStream<GT, OT> stream, List<DataSelector> orderBys) {
         if (stream.isOrderedBy(orderBys)) {
             return stream;
         } else {
             Comparator<Pair<GT, Stream<OT>>> comparator = (v1, v2) -> {
-                for (MemberAccessor orderBy : orderBys) {
+                for (DataSelector orderBy : orderBys) {
                     Comparable c1 = (Comparable) stream.accessMapper(orderBy).apply(v1);
                     Comparable c2 = (Comparable) stream.accessMapper(orderBy).apply(v2);
                     int c = c1.compareTo(c2);
@@ -69,12 +69,12 @@ public class StreamOperations {
         }
     }
 
-    public static <RT, GT, OT> EnrichedStream<RT, RT> project(EnrichedStream<GT, OT> enrichedStream, List<MemberAccessor> projections) {
+    public static <RT, GT, OT> EnrichedStream<RT, RT> project(EnrichedStream<GT, OT> enrichedStream, List<DataSelector> projections) {
         Function<Pair<GT, Stream<OT>>, RT> f = v -> {
             Map<Integer, Object> map = new HashMap<>();
 
             for (int i = 0; i < projections.size(); ++i) {
-                MemberAccessor m = projections.get(i);
+                DataSelector m = projections.get(i);
                 if (m.type() == AggregationFunction.Type.NONE) {
                     map.put(i, enrichedStream.accessMapper(m).apply(v));
                 }
@@ -83,7 +83,7 @@ public class StreamOperations {
             Map<Integer, BiFunction<Object, Object, Object>> mapper = new HashMap<>(); // (access object, newObject) -> new access
 
             for (int i = 0; i < projections.size(); ++i) {
-                MemberAccessor m = projections.get(i);
+                DataSelector m = projections.get(i);
                 switch (m.type()) {
                     case LIST:
                         List l = new ArrayList();
@@ -107,7 +107,7 @@ public class StreamOperations {
 
             v.right().forEach(v1 -> {
                 for (int i = 0; i < projections.size(); ++i) {
-                    MemberAccessor m = projections.get(i);
+                    DataSelector m = projections.get(i);
                     if (m.type() != AggregationFunction.Type.NONE) {
                         Object newObj = mapper.get(i).apply(map.get(i), enrichedStream.aggregateMapper(m).apply(v1));
                         map.put(i, newObj);

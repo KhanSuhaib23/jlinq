@@ -5,17 +5,17 @@ import com.snk.jlinq.stream.expression.Condition;
 import com.snk.jlinq.util.StreamOperations;
 
 
-public class FilterStreamOp<GT, OT> implements StreamOp<GT, OT> {
-    private final StreamOp<GT, OT> baseStream;
+public class FilterStreamOp<GroupedType, OriginalType> implements StreamOp<GroupedType, OriginalType> {
+    private final StreamOp<GroupedType, OriginalType> baseStream;
     private final Condition filterCondition;
 
-    public FilterStreamOp(StreamOp<GT, OT> baseStream, Condition filterCondition) {
+    public FilterStreamOp(StreamOp<GroupedType, OriginalType> baseStream, Condition filterCondition) {
         this.baseStream = baseStream;
         this.filterCondition = filterCondition;
     }
 
     @Override
-    public EnrichedStream<GT, OT> outputStream() {
+    public EnrichedStream<GroupedType, OriginalType> outputStream() {
         return StreamOperations.where(baseStream.outputStream(), filterCondition);
     }
 }

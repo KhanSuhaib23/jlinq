@@ -1,7 +1,7 @@
 package com.snk.jlinq.grammar;
 
 import com.snk.jlinq.function.Function1;
-import com.snk.jlinq.stream.MemberAccessor;
+import com.snk.jlinq.stream.DataSelector;
 import com.snk.jlinq.stream.operation.OrderedStreamOp;
 import com.snk.jlinq.stream.operation.StreamOp;
 import com.snk.jlinq.util.ListUtil;
@@ -9,36 +9,36 @@ import com.snk.jlinq.util.ListUtil;
 import java.util.Arrays;
 import java.util.List;
 
-public class GotOrderByExpectingThen<GT, OT> extends FilterableStream<GT, OT> {
-    private final List<MemberAccessor> orderBys;
+public class GotOrderByExpectingThen<GroupedType, OriginalType> extends FilterableStream<GroupedType, OriginalType> {
+    private final List<DataSelector> orderBys;
 
-    public GotOrderByExpectingThen(StreamOp<GT, OT> operatingStream, List<MemberAccessor> orderBy) {
+    public GotOrderByExpectingThen(StreamOp<GroupedType, OriginalType> operatingStream, List<DataSelector> orderBy) {
         super(operatingStream);
         this.orderBys = orderBy;
     }
 
-    public GotOrderByExpectingThen(StreamOp<GT, OT> operatingStream, MemberAccessor orderBy) {
+    public GotOrderByExpectingThen(StreamOp<GroupedType, OriginalType> operatingStream, DataSelector orderBy) {
         this(operatingStream, Arrays.asList(orderBy));
     }
 
-    public GotOrderByExpectingThen(StreamOp<GT, OT> operatingStream, List<MemberAccessor> orderBy, MemberAccessor additionalOrderBy) {
+    public GotOrderByExpectingThen(StreamOp<GroupedType, OriginalType> operatingStream, List<DataSelector> orderBy, DataSelector additionalOrderBy) {
         this(operatingStream, ListUtil.concat(orderBy, additionalOrderBy));
     }
 
-    public <IN, OUT extends Comparable<OUT>> GotOrderByExpectingThen<GT, OT> then(Function1<IN, OUT> mapper) {
-        return then (MemberAccessor.from(mapper));
+    public <IN, OUT extends Comparable<OUT>> GotOrderByExpectingThen<GroupedType, OriginalType> then(Function1<IN, OUT> mapper) {
+        return then (DataSelector.from(mapper));
     }
 
-    public <IN, OUT extends Comparable<OUT>> GotOrderByExpectingThen<GT, OT> then(String alias, Function1<IN, OUT> mapper) {
-        return then(MemberAccessor.from(alias, mapper));
+    public <IN, OUT extends Comparable<OUT>> GotOrderByExpectingThen<GroupedType, OriginalType> then(String alias, Function1<IN, OUT> mapper) {
+        return then(DataSelector.from(alias, mapper));
     }
 
-    private <OUT extends Comparable<OUT>> GotOrderByExpectingThen<GT, OT> then(MemberAccessor<OUT> memberAccessor) {
-        return new GotOrderByExpectingThen<>(operatingStream, orderBys, memberAccessor);
+    private <OUT extends Comparable<OUT>> GotOrderByExpectingThen<GroupedType, OriginalType> then(DataSelector<OUT> selector) {
+        return new GotOrderByExpectingThen<>(operatingStream, orderBys, selector);
     }
 
     @Override
-    public StreamOp<GT, OT> operatingStream() {
+    public StreamOp<GroupedType, OriginalType> operatingStream() {
         return new OrderedStreamOp<>(operatingStream, orderBys);
     }
 }

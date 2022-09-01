@@ -21,13 +21,13 @@ public class StreamContext {
             );
 
     private final Class<?> mainClass;
-    private final List2<MemberAccessor, Function<Object, Object>> memberAccessMap;
+    private final List2<DataSelector, Function<Object, Object>> memberAccessMap;
     private final List2<StreamAlias, Function<Object, Object>> streamAliasMap;
     private final List2<StreamAlias, Function<Object, Object>> groupMemberAccessor;
 
     private static final Function<Object, Object> groupTypeAccessor = (Object p) -> ((Pair) p).left();
 
-    private StreamContext(Class<?> mainClass, List2<MemberAccessor, Function<Object, Object>> memberAccessMap,
+    private StreamContext(Class<?> mainClass, List2<DataSelector, Function<Object, Object>> memberAccessMap,
                           List2<StreamAlias, Function<Object, Object>> streamAliasMap,
                           List2<StreamAlias, Function<Object, Object>> groupMemberAccessor) {
         this.mainClass = mainClass;
@@ -36,7 +36,7 @@ public class StreamContext {
         this.groupMemberAccessor = groupMemberAccessor;
     }
 
-    private static StreamContext of(Class<?> mainClass, List2<MemberAccessor, Function<Object, Object>> memberAccessMap,
+    private static StreamContext of(Class<?> mainClass, List2<DataSelector, Function<Object, Object>> memberAccessMap,
                                     List2<StreamAlias, Function<Object, Object>> groupMemberAccessor) {
         return new StreamContext(mainClass, memberAccessMap, List2.empty(), groupMemberAccessor);
     }
@@ -45,23 +45,23 @@ public class StreamContext {
         return new StreamContext(mainClass, List2.empty(), streamAliasMap, List2.empty());
     }
 
-    public Function<Object, Object> getAggregate(MemberAccessor memberAccessor) {
+    public Function<Object, Object> getAggregate(DataSelector selector) {
         return groupMemberAccessor.stream()
-                .filter(m -> m.left().equals(memberAccessor.streamAlias()))
+                .filter(m -> m.left().equals(selector.streamAlias()))
                 .map(Pair::right)
-                .map(f -> f.andThen(o -> MethodUtil.invoke(memberAccessor.method(), o)))
+                .map(f -> f.andThen(o -> MethodUtil.invoke(selector.method(), o)))
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
     }
 
-    public Function<Object, Object> get(MemberAccessor memberAccessor) {
-        List<Pair<MemberAccessor, Function<Object, Object>>> l = memberAccessMap.stream()
-                .filter(p -> memberAccessor.streamAlias().canMatch(p.left().streamAlias()))
-                .filter(p -> p.left().method().equals(memberAccessor.method()))
+    public Function<Object, Object> get(DataSelector selector) {
+        List<Pair<DataSelector, Function<Object, Object>>> l = memberAccessMap.stream()
+                .filter(p -> selector.streamAlias().canMatch(p.left().streamAlias()))
+                .filter(p -> p.left().method().equals(selector.method()))
                 .collect(Collectors.toList());
 
         if (l.size() == 0) {
-            return get(memberAccessor.streamAlias(), memberAccessor.method());
+            return get(selector.streamAlias(), selector.method());
         } else if (l.size() == 1) {
             return groupTypeAccessor.andThen(l.get(0).right());
         } else {
@@ -69,7 +69,7 @@ public class StreamContext {
                     .filter(p -> p.left().streamAlias().name().isBlank())
                     .findFirst()
                     .map(Pair::right)
-                    .map(f -> groupTypeAccessor.andThen(f).andThen(o -> MethodUtil.invoke(memberAccessor.method(), o)))
+                    .map(f -> groupTypeAccessor.andThen(f).andThen(o -> MethodUtil.invoke(selector.method(), o)))
                     .orElseThrow(RuntimeException::new);
         }
     }
@@ -139,18 +139,18 @@ public class StreamContext {
         return of(mainClass, newList);
     }
 
-    public StreamContext groupBy(List<MemberAccessor> groupBys) {
+    public StreamContext groupBy(List<DataSelector> groupBys) {
 
         if (groupBys.size() == 1) {
             return of(mainClass, List2.of(groupBys.get(0), Function.identity()), streamAliasMap);
         }
-        List2<MemberAccessor, Function<Object, Object>> memberAccessorFunctionMap = new List2<>();
+        List2<DataSelector, Function<Object, Object>> selectorFunctionMap = new List2<>();
         int i = 0;
-        for (MemberAccessor groupBy : groupBys) {
-            memberAccessorFunctionMap.add(groupBy, baseMapper.get(i));
+        for (DataSelector groupBy : groupBys) {
+            selectorFunctionMap.add(groupBy, baseMapper.get(i));
             i++;
         }
 
-        return of(mainClass, memberAccessorFunctionMap, streamAliasMap);
+        return of(mainClass, selectorFunctionMap, streamAliasMap);
     }
 }

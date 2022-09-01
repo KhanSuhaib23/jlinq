@@ -1,6 +1,6 @@
 package com.snk.jlinq.stream.expression;
 
-import com.snk.jlinq.stream.MemberAccessor;
+import com.snk.jlinq.stream.DataSelector;
 import com.snk.jlinq.stream.StreamContext;
 
 public abstract class ExpressionValue<T> {
@@ -9,16 +9,16 @@ public abstract class ExpressionValue<T> {
         return new Scalar<>(value);
     }
 
-    public static <T> ExpressionValue<T> fromExtractor(MemberAccessor<T> extractor) {
+    public static <T> ExpressionValue<T> fromExtractor(DataSelector<T> extractor) {
         return new Extractor<>(extractor);
     }
 
     public abstract <R> T getValue(StreamContext streamContext, R in);
 
     public static class Extractor<T> extends ExpressionValue<T> {
-        private final MemberAccessor<T> reference;
+        private final DataSelector<T> reference;
 
-        public Extractor(MemberAccessor<T> reference) {
+        public Extractor(DataSelector<T> reference) {
             this.reference = reference;
         }
 

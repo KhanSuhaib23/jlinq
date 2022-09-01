@@ -3,7 +3,7 @@ package com.snk.jlinq.grammar.expression;
 import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.grammar.ExpectingSelect;
 import com.snk.jlinq.grammar.InWhereExpectingExpression;
-import com.snk.jlinq.stream.MemberAccessor;
+import com.snk.jlinq.stream.DataSelector;
 import com.snk.jlinq.stream.expression.Condition;
 import com.snk.jlinq.stream.expression.ExpressionValue;
 import com.snk.jlinq.stream.operation.FilterStreamOp;
@@ -20,18 +20,18 @@ public class InWhereExpressionExtender<GroupedType, OriginalType> extends Expect
         this.baseExpression = baseExpression;
     }
 
-    public static <GT, OT> InWhereExpressionExtender<GT, OT> of(ExpressionBuilder<GT, OT, InWhereExpectingExpression<GT, OT>> expressionBuilderConstructor) {
+    public static <GroupedType, OriginalType> InWhereExpressionExtender<GroupedType, OriginalType> of(ExpressionBuilder<GroupedType, OriginalType, InWhereExpectingExpression<GroupedType, OriginalType>> expressionBuilderConstructor) {
         return new InWhereExpressionExtender<>(expressionBuilderConstructor);
     }
 
     @Override
     public <IN, OUT> GotPartialExpression<GroupedType, OriginalType, OUT, InWhereExpectingExpression<GroupedType, OriginalType>> and(String alias, Function1<IN, OUT> mapper) {
-        return and(ExpressionValue.fromExtractor(MemberAccessor.from(alias, mapper)));
+        return and(ExpressionValue.fromExtractor(DataSelector.from(alias, mapper)));
     }
 
     @Override
     public <IN, OUT> GotPartialExpression<GroupedType, OriginalType, OUT, InWhereExpectingExpression<GroupedType, OriginalType>> and(Function1<IN, OUT> mapper) {
-        return and(ExpressionValue.fromExtractor(MemberAccessor.from(mapper)));
+        return and(ExpressionValue.fromExtractor(DataSelector.from(mapper)));
     }
 
     @Override
@@ -41,12 +41,12 @@ public class InWhereExpressionExtender<GroupedType, OriginalType> extends Expect
 
     @Override
     public <IN, OUT> GotPartialExpression<GroupedType, OriginalType, OUT, InWhereExpectingExpression<GroupedType, OriginalType>> or(String alias, Function1<IN, OUT> mapper) {
-        return or(ExpressionValue.fromExtractor(MemberAccessor.from(alias, mapper)));
+        return or(ExpressionValue.fromExtractor(DataSelector.from(alias, mapper)));
     }
 
     @Override
     public <IN, OUT> GotPartialExpression<GroupedType, OriginalType, OUT, InWhereExpectingExpression<GroupedType, OriginalType>> or(Function1<IN, OUT> mapper) {
-        return or(ExpressionValue.fromExtractor(MemberAccessor.from(mapper)));
+        return or(ExpressionValue.fromExtractor(DataSelector.from(mapper)));
     }
 
     @Override

@@ -2,40 +2,35 @@ package com.snk.jlinq.grammar;
 
 import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.grammar.projection.InSelectExpectingComma1;
+import com.snk.jlinq.stream.DataSelector;
 import com.snk.jlinq.stream.EnrichedStream;
-import com.snk.jlinq.stream.MemberAccessor;
 import com.snk.jlinq.stream.operation.StreamOp;
 
+public class ExpectingSelect<GroupedType, OriginalType> extends SelectStream<GroupedType, OriginalType> {
+    protected final StreamOp<GroupedType, OriginalType> operatingStream;
 
-// RT: Return Type. Type of the stream being returned.
-// OT: Operating Type. Type of the stream on which we are operating on.
-// Select essentially apply some operation on type OT (type of underlying stream) to convert is to RT, which is the
-// type of the returned stream
-public class ExpectingSelect<GT, OT> extends SelectStream<GT, OT> {
-    protected final StreamOp<GT, OT> operatingStream;
-
-    public ExpectingSelect(StreamOp<GT, OT> operatingStream) {
+    public ExpectingSelect(StreamOp<GroupedType, OriginalType> operatingStream) {
         this.operatingStream = operatingStream;
     }
 
-    public <IN, OUT> InSelectExpectingComma1<OUT, GT, OT> select(String alias, Function1<IN, OUT> mapper) {
-        return new InSelectExpectingComma1<>(operatingStream(), MemberAccessor.from(alias, mapper));
+    public <IN, OUT> InSelectExpectingComma1<OUT, GroupedType, OriginalType> select(String alias, Function1<IN, OUT> mapper) {
+        return new InSelectExpectingComma1<>(operatingStream(), DataSelector.from(alias, mapper));
     }
 
-    public <IN, OUT> InSelectExpectingComma1<OUT, GT, OT> select(Function1<IN, OUT> mapper) {
-        return new InSelectExpectingComma1<>(operatingStream(), MemberAccessor.from(mapper));
+    public <IN, OUT> InSelectExpectingComma1<OUT, GroupedType, OriginalType> select(Function1<IN, OUT> mapper) {
+        return new InSelectExpectingComma1<>(operatingStream(), DataSelector.from(mapper));
     }
 
-    public <IN, OUT> InSelectExpectingComma1<OUT, GT, OT> select(MemberAccessor<OUT> memberAccessor) {
-        return new InSelectExpectingComma1<>(operatingStream(), memberAccessor);
+    public <IN, OUT> InSelectExpectingComma1<OUT, GroupedType, OriginalType> select(DataSelector<OUT> selector) {
+        return new InSelectExpectingComma1<>(operatingStream(), selector);
     }
 
-    public StreamOp<GT, OT> operatingStream() {
+    public StreamOp<GroupedType, OriginalType> operatingStream() {
         return operatingStream;
     }
 
     @Override
-    public EnrichedStream<GT, OT> outputStream() {
+    public EnrichedStream<GroupedType, OriginalType> outputStream() {
         return operatingStream().outputStream();
     }
 }

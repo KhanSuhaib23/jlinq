@@ -1,7 +1,7 @@
 package com.snk.jlinq.stream.operation;
 
+import com.snk.jlinq.stream.DataSelector;
 import com.snk.jlinq.stream.EnrichedStream;
-import com.snk.jlinq.stream.MemberAccessor;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ public class GroupedStreamBuilderOp<GroupedType, OriginalType> implements Stream
         this.baseStream = baseStream;
     }
 
-    public GroupedStreamOp<GroupedType, OriginalType> buildGroup(List<MemberAccessor> groupBys) {
+    public GroupedStreamOp<GroupedType, OriginalType> buildGroup(List<DataSelector> groupBys) {
         return new GroupedStreamOp<>(baseStream, groupBys);
     }
 
