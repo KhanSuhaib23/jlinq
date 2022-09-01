@@ -25,7 +25,7 @@ public class ExpectingJoin1Stream<T> extends ExpectingOrderBy<T, T> {
 
     public <TN> InJoinExpectingOn<T, TN, Tuple2<T, TN>, ExpectingJoin2Stream<T, TN>> join(String alias, EnrichedStream<TN, TN> stream) {
         return new InJoinExpectingOn<>(operatingStream(),
-                new RootStreamOp<>(EnrichedStream.singleStream(stream.singleStream(), StreamContext.init(alias, stream.context().mainClass()), Collections.emptyList())),
+                new RootStreamOp<>(EnrichedStream.singleStream(stream.singleStream(), StreamContext.init(alias, stream.context().classAt(0)), Collections.emptyList())),
                 baseExp -> new ExpectingJoin2Stream<>(baseExp));
     }
 }

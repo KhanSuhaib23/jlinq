@@ -109,7 +109,7 @@ public class StreamOperations {
                 for (int i = 0; i < projections.size(); ++i) {
                     MemberAccessor m = projections.get(i);
                     if (m.type() != AggregationFunction.Type.NONE) {
-                        Object newObj = mapper.get(i).apply(map.get(i), enrichedStream.context().getAggregate(m).apply(v1));
+                        Object newObj = mapper.get(i).apply(map.get(i), enrichedStream.aggregateMapper(m).apply(v1));
                         map.put(i, newObj);
                     }
                 }

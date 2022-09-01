@@ -27,7 +27,7 @@ public class ExpectingJoin2Stream<T1, T2> extends InJoinExpressionExtender<Tuple
 
     public <TN> InJoinExpectingOn<Tuple2<T1, T2>, TN, Tuple3<T1, T2, TN>, ExpectingJoin3Stream<T1, T2, TN>> join(String alias, EnrichedStream<TN, TN> stream) {
         return new InJoinExpectingOn<>(operatingStream(),
-                new RootStreamOp<>(EnrichedStream.singleStream(stream.singleStream(), StreamContext.init(alias, stream.context().mainClass()), Collections.emptyList())),
+                new RootStreamOp<>(EnrichedStream.singleStream(stream.singleStream(), StreamContext.init(alias, stream.context().classAt(0)), Collections.emptyList())),
                 baseExp -> new ExpectingJoin3Stream<>(baseExp));
     }
 
