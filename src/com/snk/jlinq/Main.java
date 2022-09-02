@@ -65,7 +65,8 @@ public class Main {
                     .groupBy(Department::name).comma(Department::id)
                     .orderBy(Department::id)
                     .where(Department::id).eq(2)
-                    .select(count(Employee::id)).comma(list(Employee::name)).comma(count(Employee::name))
+                    .select(count(Employee::id))
+                        .comma(list(Employee::name)).comma(count(Employee::name))
                     .toList();
 
         System.out.println();

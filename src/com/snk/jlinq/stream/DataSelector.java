@@ -5,9 +5,10 @@ import com.snk.jlinq.function.Function1;
 import com.snk.jlinq.util.MethodUtil;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Objects;
 
-public class DataSelector {
+public class DataSelector<T> {
     private final AggregationFunction.Type type;
     private final Method method;
     private final String alias;
@@ -30,19 +31,19 @@ public class DataSelector {
         return StreamAlias.of(method.getDeclaringClass(), alias);
     }
 
-    public static <IN, OUT> DataSelector from(String alias, Function1<IN, OUT> function) {
+    public static <IN, OUT> DataSelector<OUT> from(String alias, Function1<IN, OUT> function) {
         return new DataSelector(MethodUtil.getMethodFromMethodReference(function), alias, AggregationFunction.Type.NONE);
     }
 
-    public static <IN, OUT> DataSelector from(Function1<IN, OUT> function) {
+    public static <IN, OUT> DataSelector<OUT> from(Function1<IN, OUT> function) {
         return new DataSelector(MethodUtil.getMethodFromMethodReference(function), "", AggregationFunction.Type.NONE);
     }
 
-    public static <IN, OUT> DataSelector list(Function1<IN, OUT> function) {
+    public static <IN, OUT> DataSelector<List<OUT>> list(Function1<IN, OUT> function) {
         return new DataSelector(MethodUtil.getMethodFromMethodReference(function), "", AggregationFunction.Type.LIST);
     }
 
-    public static <IN, OUT> DataSelector count(Function1<IN,OUT> mapper) {
+    public static <IN, OUT> DataSelector<Long> count(Function1<IN,OUT> mapper) {
         return new DataSelector(MethodUtil.getMethodFromMethodReference(mapper), "", AggregationFunction.Type.COUNT);
     }
 

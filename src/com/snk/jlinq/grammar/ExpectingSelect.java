@@ -21,7 +21,7 @@ public class ExpectingSelect<GroupedType, OriginalType> extends SelectStream<Gro
         return new InSelectExpectingComma1<>(operatingStream(), DataSelector.from(mapper));
     }
 
-    public <OUT> InSelectExpectingComma1<OUT, GroupedType, OriginalType> select(DataSelector selector) {
+    public <OUT> InSelectExpectingComma1<OUT, GroupedType, OriginalType> select(DataSelector<OUT> selector) {
         return new InSelectExpectingComma1<>(operatingStream(), selector);
     }
 
