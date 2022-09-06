@@ -58,7 +58,7 @@ public class StreamContext {
                 .map(Pair::right)
                 .map(f -> f.andThen(o -> MethodUtil.invoke(selector.method(), o)))
                 .findFirst()
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new RuntimeException("Cannot resolve accessor for " + selector.streamAlias().debugString()));
     }
 
     public Function<Object, Object> get(DataSelector selector) {
@@ -76,7 +76,7 @@ public class StreamContext {
                     .findFirst()
                     .map(Pair::right)
                     .map(f -> groupTypeAccessor.andThen(f).andThen(o -> MethodUtil.invoke(selector.method(), o)))
-                    .orElseThrow(RuntimeException::new);
+                    .orElseThrow(() -> new RuntimeException("Cannot resolve accessor for " + selector.streamAlias().debugString()));
         }
     }
 
@@ -85,7 +85,7 @@ public class StreamContext {
                 .filter(p -> alias.canMatch(p.left())).toList();
 
         if (l.size() == 0) {
-            throw new RuntimeException("No stream provided with definition " + alias);
+            throw new RuntimeException("No stream provided that matches " + alias.debugString());
         } else if (l.size() == 1) {
             return groupTypeAccessor.andThen(l.get(0).right()).andThen(o -> MethodUtil.invoke(method, o));
         } else {
@@ -94,7 +94,7 @@ public class StreamContext {
                     .findFirst()
                     .map(Pair::right)
                     .map(f -> groupTypeAccessor.andThen(f).andThen(o -> MethodUtil.invoke(method, o)))
-                    .orElseThrow(RuntimeException::new);
+                    .orElseThrow(() -> new RuntimeException("Cannot resolve accessor for " + alias.debugString()));
         }
     }
 
@@ -110,7 +110,7 @@ public class StreamContext {
         if (index == 0 && streamAliasMap.size() == 1) {
             return streamAliasMap.get(index).left().clazz();
         } else {
-            throw new RuntimeException("Right now only support index 0 (size 1) operations");
+            throw new UnsupportedOperationException("Right now only support index 0 (size 1) operations"); // TODO(suhaink): make this support everything (although probably not necessary)
         }
     }
 
@@ -122,7 +122,7 @@ public class StreamContext {
         otherContext.streamAliasMap.streamLeft()
                 .filter(keys::contains)
                 .forEach(k -> {
-                    throw new RuntimeException("Stream Alias " + k + " already exists in context");
+                    throw new RuntimeException("Stream with definition " + k.debugString() + " already exists in context. Use a different alias.");
                 });
 
         List2<StreamAlias, Function<Object, Object>> newList = new List2<>();

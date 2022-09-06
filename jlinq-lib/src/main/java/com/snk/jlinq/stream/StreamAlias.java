@@ -53,6 +53,10 @@ public class StreamAlias {
         return result;
     }
 
+    public String debugString() {
+        return String.format("[alias: %s, class: %s]", name, clazz.getSimpleName());
+    }
+
     @Override
     public String toString() {
         return "StreamAlias{" +

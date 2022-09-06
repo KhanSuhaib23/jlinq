@@ -28,6 +28,6 @@ public class JoinStreamBuilderOp<T1, T2, OutputType> implements StreamOp<OutputT
 
     @Override
     public EnrichedStream<OutputType, OutputType> outputStream() {
-        throw new RuntimeException("never to be called");
+        throw new IllegalStateException("Method should not be called!");
     }
 }

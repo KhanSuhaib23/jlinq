@@ -21,7 +21,7 @@ public class MethodUtil {
             method.setAccessible(true);
             return (T) method.invoke(object, params);
         } catch (IllegalAccessException | InvocationTargetException | ClassCastException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error invoking method '" + method.getClass().getSimpleName() + "::" + method.getName() + ".\n" + e.getMessage());
         }
     }
 }
