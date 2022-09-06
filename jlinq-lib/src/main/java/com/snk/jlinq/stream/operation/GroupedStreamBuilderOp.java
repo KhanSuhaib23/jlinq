@@ -22,6 +22,6 @@ public class GroupedStreamBuilderOp<GroupedType, OriginalType> implements Stream
 
     @Override
     public EnrichedStream<GroupedType, OriginalType> outputStream() {
-        throw new RuntimeException("never called");
+        throw new IllegalStateException("Method should not be called!");
     }
 }

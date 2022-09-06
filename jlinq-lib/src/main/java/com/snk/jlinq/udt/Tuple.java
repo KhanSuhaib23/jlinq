@@ -10,7 +10,7 @@ public class Tuple {
             case 1 -> objectList.get(0);
             case 2 -> new Tuple2<>(objectList.get(0), objectList.get(1));
             case 3 -> new Tuple3<>(objectList.get(0), objectList.get(1), objectList.get(2));
-            default -> throw new RuntimeException("Tuple index exceeded max tuple size");
+            default -> throw new UnsupportedOperationException("Tuple of size > 3 not supported at the moment");
         };
     }
 }
