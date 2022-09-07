@@ -40,7 +40,7 @@ public class Main {
         List<Department> departments = Stream.of(
                 new Department(1, "COMP"),
                 new Department(2, "IT"),
-                new Department(3, "ELECTRONIC")
+                new Department(3, "EXTC")
         ).toList();
 
         @SuppressWarnings("unused")
