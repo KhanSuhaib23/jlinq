@@ -85,7 +85,11 @@ public class StreamContext {
                 .filter(p -> alias.canMatch(p.left())).toList();
 
         if (l.size() == 0) {
-            throw new RuntimeException("No stream provided that matches " + alias.debugString());
+            if (groupMemberAccessor.stream().map(Pair::left).anyMatch(p -> p.canMatch(alias))) {
+                throw new RuntimeException("Direct selecting from a non grouped member, aggregation function on this select.");
+            } else {
+                throw new RuntimeException("No stream provided that matches " + alias.debugString());
+            }
         } else if (l.size() == 1) {
             return groupTypeAccessor.andThen(l.get(0).right()).andThen(o -> MethodUtil.invoke(method, o));
         } else {
